@@ -51,6 +51,10 @@ class RoutingInitiator
     {
         try {
             $rest = 'project\backend\rest\\'.ucfirst($this->target[0]).'Rest';
+            if (!file_exists(ROOT.'\\'.$rest.'.php'))
+            {
+                throw new \Exception('requesthandler '.$this->target[0].'Rest not exists');
+            }
             $rest = new $rest();
             $routing = Routing::getInstance();
             $routing->addRoutes($rest);
@@ -62,10 +66,10 @@ class RoutingInitiator
                 echo json_encode(array("errorCode"=>'ROUTER_NOT_FOUND'));
                 die();
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             header($_SERVER['SERVER_PROTOCOL'] . ' 500 Vegzetes hiba');
-            header("Content-Type: application/json");
-            die(json_encode(array("error" => $e->getMessage())));
+            die(json_encode($e->getMessage()));
+
         }
     }
 

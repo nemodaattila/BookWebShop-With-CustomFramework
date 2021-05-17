@@ -19,7 +19,6 @@ class DirectoryHelper
     {
         if ($config === null) $config=self::getDirectoryHelperConfig();
         $fileList = self::fileListing($directory, $config);
-        var_dump($fileList);
         if ($convertToUrl === true) $fileList = self::covertDirToUrl($fileList);
         return $fileList;
     }

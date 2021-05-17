@@ -30,7 +30,7 @@ class WebPageGenerator
 
     private function loadProjectConfigFiles(): void                        //konfigurációs fájlok behívása
     {
-        require_once 'project\config\config.php';
+        require_once 'project\config\webPageConfig.php';
         if (file_exists('project\frontend\pages\\'.$this->pageToLoad.'\config.php'))
             require_once 'project\frontend\pages\\'.$this->pageToLoad.'\config.php';
     }
@@ -38,7 +38,6 @@ class WebPageGenerator
     private function processAdditionsBasedOnPageConfig(): void
     {
         $config = WebPageConfig::getInstance();
-//        var_dump($config);
         $this->loadSessionHelper($config->isSessionEnabled());
         $this->loadViewHandler($config->isSessionEnabled(),$config->getLayout());
 
@@ -60,7 +59,7 @@ class WebPageGenerator
             $params = $this->requestParameters;
         if ($jsEnabled === true)
         {
-            $jsC=new JavaScriptInitiator($params);
+            $jsC=new JavaScriptInitiator($this->pageToLoad, $params);
             $jsC->prepare();
             $jsC->loadAjaxFiles($ajaxEnabled);
             $jsC->passParamsToJS($passParams);

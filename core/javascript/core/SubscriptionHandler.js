@@ -15,9 +15,9 @@ class SubscriptionHandler
         else this.subscriptions[callWord].push([classPointer, functionName]);
     }
 
-    static initSubscription(callback, resultState, result)
+    static initSubscription(callback, resultData, resultState )
     {
-        console.log(result)
+        console.log(resultData)
         console.log(callback)
         console.log(this.subscriptions)
         if (this.subscriptions === undefined)
@@ -33,15 +33,20 @@ class SubscriptionHandler
             callback.push('subscription resultState vas undefined');
         }
 
-        if (Array.isArray(result) && result.length === 1)
-            result=result[0]
+        if (Array.isArray(resultData) && resultData.length === 1)
+            resultData=resultData[0]
 
-        this.callSubscribedFunctions(callback, resultState, result);
+        this.callSubscribedFunctions(callback, resultData, resultState);
     }
 
     static callSubscribedFunctions(callback, resultState, result) {
         for (let callword of callback)
         {
+            if (this.subscriptions[callword] === undefined)
+            {
+                console.log(callword +' - keyword not exists or there is not subscriber');
+                continue
+            }
             console.log(callword)
                 for (let [classPointer, functionName ] of this.subscriptions[callword])
                 {

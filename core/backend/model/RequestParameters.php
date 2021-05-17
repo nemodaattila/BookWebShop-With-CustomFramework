@@ -4,9 +4,9 @@
 namespace core\backend\model;
 
 
-use core\backend\interfaces\ConvertableToArrayInterface;
+use core\backend\interfaces\IConvertableToArrayInterface;
 
-class RequestParameters implements ConvertableToArrayInterface
+class RequestParameters implements IConvertableToArrayInterface
 {
     private array $urlParameters;
     private array $requestData;

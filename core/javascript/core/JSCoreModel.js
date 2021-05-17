@@ -1,4 +1,11 @@
 class JSCoreModel{
+    get requestParameters() {
+        return this._requestParameters;
+    }
+
+    set requestParameters(value) {
+        this._requestParameters = value;
+    }
     get javascriptUrl() {
         return this._javascriptUrl;
     }

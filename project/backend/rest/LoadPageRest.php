@@ -5,17 +5,15 @@ namespace project\backend\rest;
 
 
 use core\backend\model\RequestParameters;
-use core\backend\interfaces\restInterface;
+use core\backend\interfaces\IRestInterface;
+use core\backend\service\RestParent;
 use project\backend\service\WebPageGenerator;
 
-class LoadPageRest implements restInterface
+class LoadPageRest extends RestParent
 {
-    private array $routes = [['GET', 'loadPage/$1', 'loadPage',false,false, false]];
-
-    public function getRoutes(): array
-    {
-        return $this->routes;
-    }
+    protected array $routes = [
+        ['GET', 'loadPage/$1', 'loadPage',false,false, false]
+    ];
 
     public function loadPage(RequestParameters $paremeters)
     {

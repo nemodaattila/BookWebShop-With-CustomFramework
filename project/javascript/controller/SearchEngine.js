@@ -1,7 +1,16 @@
 class SearchEngine extends ControllerParent{
 
+    constructor(){
+        super();
+        if(! SearchEngine._instance){
+            SearchEngine._instance = this;
+        }
+        return SearchEngine._instance;
+    }
+
     initSearch(setDefault=true)
     {
+        console.log(this)
         let isLocal=false;
         this.model.setPrevCrit()
         if (setDefault) this.model.setDefault();
@@ -11,12 +20,20 @@ class SearchEngine extends ControllerParent{
         isLocal=this.localOrderChecker();
         let params=this.model.getSearchParams();
         console.log(isLocal)
+        console.log(params)
         if (isLocal===false)
         {
-
-            params.task="searchBooks",
-                console.log(params);
-            AjaxCaller.sendPostRequest("BookListGetter",params,this, "getBooks")
+            let ac = new AjaxCaller()
+            ac.targetUrl = JSCore.getRoot()+"/book/withParameter/";
+            ac.requestType = 'POST';
+            ac.addCustomHeader('Content-Type', 'application/json')
+            ac.postFields = params;
+            ac._subscriptionCallWord="getBooks";
+            console.log(ac)
+            ac.send();
+            // params.tasek="searchBooks",
+            //     console.log(params);
+            // AjaxCaller.sendPostRequest("BookListGetter",params,this, "getBooks")
         }
         else
         {
@@ -57,7 +74,7 @@ class SearchEngine extends ControllerParent{
     checkJSCoreForData()
     {
         //DO check
-        let data = JSCoreController.getRequestData()
+        let data = JSCore.getRequestData()
         if (data["quicksearch"]!==undefined)
         {
             this.model.setCrit("Quick", data["quicksearch"])

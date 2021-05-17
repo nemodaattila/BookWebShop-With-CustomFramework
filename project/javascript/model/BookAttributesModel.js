@@ -1,28 +1,29 @@
 class BookAttributesModel {
+    get subCategory() {
+        return this._subCategory;
+    }
 
-    _category;
-    _discount;
+    set subCategory(value) {
+        this._subCategory = value;
+    }
+
+    _mainCategory;
+    _subCategory;
+
     _format;
     _language;
     _tags;
     _targetAudience
     _type;
 
-    get category() {
-        return this._category;
+    get mainCategory() {
+        return this._mainCategory;
     }
 
-    set category(value) {
-        this._category = value;
+    set mainCategory(value) {
+        this._mainCategory = value;
     }
 
-    get discount() {
-        return this._discount;
-    }
-
-    set discount(value) {
-        this._discount = value;
-    }
 
     get format() {
         return this._format;
@@ -66,8 +67,8 @@ class BookAttributesModel {
 
     setBookAttribs(attribs)
     {
-        this.category=attribs.category;
-        this.discount=attribs.discount;
+        this.mainCategory=attribs.mainCategory;
+        this.subCategory=attribs.subCategory;
         this.format=attribs.format;
         this.language=attribs.language;
         this.tags=attribs.tags;

@@ -1,8 +1,10 @@
 <?php
 namespace core\backend\service;
+use core\backend\helper\VariableHelper;
 use core\backend\model\RequestParameters;
+use core\backend\model\RequestResultException;
 use mysql_xdevapi\Exception;
-use core\backend\interfaces\restInterface;
+use core\backend\interfaces\IRestInterface;
 
 /**
  * Class Routing a request alapján az útvonal betültését és meghívását intézi
@@ -24,7 +26,7 @@ final class Routing
     /**
      * @var RestParent a requestfeldolgozó a request alapján
      */
-    private restInterface $rest;
+    private IRestInterface $rest;
 
     /**
      * @var array a felvett útvonalak
@@ -69,7 +71,7 @@ final class Routing
      * lekéri belőle a lehetséges Routokat tömbösen és átadja felvételre
      * @param RestParent $rest a RequestFeldolgozó -> a request első paramétere
      */
-    public function addRoutes(\core\backend\interfaces\restInterface $rest)
+    public function addRoutes(\core\backend\interfaces\IRestInterface $rest)
     {
         $this->rest = $rest;
         $routes = $this->rest->getRoutes();
@@ -187,14 +189,15 @@ final class Routing
                     {
                         [$code, $data] = $e->getResult();
                         $this->sendResponse($code, $data, $route['response_is_json']);
-                        header('Content-Type: application/json');
-                        echo json_encode($data);
                     }
                     catch (Exception $e)
                     {
                         $this->sendResponse(500, $e->getMessage(), $route['response_is_json']);
-                        header($_SERVER['SERVER_PROTOCOL'].' 500');
-                        echo $e->getMessage();
+
+                    }
+                    catch (\Error $e)
+                    {
+                        $this->sendResponse(500, $e->getMessage(), $route['response_is_json']);
                     }
                     return true;
                 }
@@ -204,6 +207,8 @@ final class Routing
             header('Acces-Control-Allow-Origin:', $this->allowedOrigin);
             header('Acces-Control-Allow-Headers:', $this->allowedHeaders);
             header('Acces-Control-Allow-Methods:', implode(',', $supportedHeaders) . ',OPTIONS');
+            header($_SERVER['SERVER_PROTOCOL'].' 500');
+            echo ('NO MATCHING ROOT FOUND');
             return true;
         }
         return false;
@@ -215,7 +220,9 @@ final class Routing
         if ($responseIsJSon === true)
         {
             header('Content-Type: application/json');
+
             echo json_encode($data);
+//            echo json_encode([$data,debug_backtrace()]);
         }
         else
             echo $data;

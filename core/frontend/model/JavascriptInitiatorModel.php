@@ -5,10 +5,10 @@ namespace core\frontend\model;
 
 
 use core\backend\helper\VariableHelper;
-use core\backend\interfaces\ConvertableToArrayInterface;
+use core\backend\interfaces\IConvertableToArrayInterface;
 use core\backend\model\RequestParameters;
 
-class JavascriptInitiatorModel implements ConvertableToArrayInterface
+class JavascriptInitiatorModel implements IConvertableToArrayInterface
 {
     private array $filesToLoad =[];
 
@@ -33,12 +33,12 @@ class JavascriptInitiatorModel implements ConvertableToArrayInterface
 
     private array $initiator;
 
-    private RequestParameters $requestParameters;
+    private ?RequestParameters $requestParameters=null;
 
     /**
      * @return RequestParameters
      */
-    public function getRequestParameters(): RequestParameters
+    public function getRequestParameters(): ?RequestParameters
     {
         return $this->requestParameters;
     }

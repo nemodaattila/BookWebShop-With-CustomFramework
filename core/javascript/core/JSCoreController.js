@@ -125,7 +125,7 @@ class JSCoreController
         }
     }
     //
-    levelLoaded(resultState, result)
+    levelLoaded(result, resultState)
     {
         console.log('bbbb')
         console.log(resultState,result)
@@ -138,11 +138,11 @@ class JSCoreController
             this.loadModuls();
         }
     }
-    //
-    // getRequestData()
-    // {
-    //     return this.model.dataFromServer
-    // }
+
+    getRequestData()
+    {
+        return this._model.requestParameters;
+    }
     //
     // getConstant(value) {
     //     return this.model[value];
@@ -154,6 +154,7 @@ class JSCoreController
     // }
 
     loadModuls() {
+        console.log('MODULS')
         console.log(this._model.modulsToLoad)
         for (let key of this._model.modulsToLoad)
         {

@@ -1,6 +1,8 @@
 <?php
 namespace project\frontend\pages\layout;
-$view = ViewHandler::getInstance();
+use core\frontend\service\ViewHandler;
+
+$view = ViewHandler::getInstance()
 ?>
 <!doctype html>
 <html lang="en">
@@ -12,7 +14,8 @@ $view = ViewHandler::getInstance();
     <title>Document</title>
 </head>
 <body>
-<h1>Udvozlom</h1>
+<h1>Üdvözlöm</h1>
+<h2>Biztos hogy jól írta be a címet?</h2>
 <?php echo $view->getMessageSession(); ?>
 <br>
 <?php echo $view->getView(); ?>

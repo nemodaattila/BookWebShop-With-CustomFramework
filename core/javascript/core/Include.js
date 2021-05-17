@@ -77,13 +77,13 @@ class Include {
                     script.onreadystatechange = null;
                     console.log(url);
                     if (callback !== null)
-                        SubscriptionHandler.initSubscription(callback, 200, url)
+                        SubscriptionHandler.initSubscription(callback, url, 200)
                         // this.callCallbackFunctions('SUCCESS', url, callback)
                 }
                 script.onerror = () =>
                 {
                     if (callback !== null)
-                        SubscriptionHandler.initSubscription(callback, 400, url)
+                        SubscriptionHandler.initSubscription(callback,url,400)
                 }
             };
         } else {  //Others
@@ -92,31 +92,31 @@ class Include {
                 console.log(callback);
                 // if (callbackParam !== null) url = [url, callbackParam]
                 if (callback !== null)
-                    SubscriptionHandler.initSubscription(callback, 200, url)
+                    SubscriptionHandler.initSubscription(callback, url, 200)
             }
             script.onerror = () =>
             {
                 if (callback !== null)
-                    SubscriptionHandler.initSubscription(callback, 400, url)
+                    SubscriptionHandler.initSubscription(callback, url, 400)
             }
         }
     }
 
-    fileLoaded(resultState, result)
+    fileLoaded(result, resultState)
     {
         console.log([resultState, result])
         if (resultState !== 200)
         {
             this.model.loadLevel = Infinity;
             console.log('ERROR - fileLoaded - ' + result)
-            SubscriptionHandler.initSubscription('levelLoaded', 400, '')
+            SubscriptionHandler.initSubscription('levelLoaded','', 400)
             return;
         }
 
         if (++this.model.progressFileCount === this.model.actualLevelFileCount)
         {
             console.log([this.model.progressFileCount, this.model.actualLevelFileCount]  );
-            SubscriptionHandler.initSubscription('levelLoaded',200, this.model.loadLevel )
+            SubscriptionHandler.initSubscription('levelLoaded', this.model.loadLevel, 200 )
         }
 
     }

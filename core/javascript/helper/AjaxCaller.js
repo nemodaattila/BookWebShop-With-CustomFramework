@@ -1,8 +1,11 @@
 // https://gist.github.com/EtienneR/2f3ab345df502bd3d13e
 class AjaxCaller
 {
-    set customHeader(value) {
-        this._customHeader = value;
+    set getResponseError(value) {
+        this._getResponseError = value;
+    }
+    addCustomHeader(name, value) {
+        this._customHeader.push([name, value]);
     }
     _targetUrl;
     _requestType;
@@ -10,7 +13,10 @@ class AjaxCaller
     // _urlParameter
     _requestParameters;
     _subscriptionCallWord;
-    _customHeader;
+    _customHeader=[];
+    _getResponseError = false;
+    _responseIsJSONEncoded = true;
+
 
 
     set subscriptionCallWord(value) {
@@ -36,38 +42,63 @@ class AjaxCaller
     send()
     {
         let request = new XMLHttpRequest();
-        console.log(request)
+
+
         request.open(this._requestType,this._targetUrl,true);
+        if (this._customHeader !== [])
+        {
+            console.log(this._customHeader)
+            for (let [name, value] of this._customHeader)
+            {
+                console.log([name, value])
+                request.setRequestHeader(name, value);
+            }
+        }
+        console.log(request)
         request.onreadystatechange = ()=>
         {
 
+
+            let resultData
+            if (request.readyState !== 4)
+                return;
             console.log("REQUESTCHANGE");
             console.log(request.readyState);
             console.log(request.status);
             console.log(request)
+            try {
+                if (this._responseIsJSONEncoded === true) {
+                    resultData = JSON.parse(request.responseText);
+                } else
+                    resultData = request.responseText;
+            }
+            catch (e)
+            {
+                resultData = request.responseText;
+            }
 
-            if (request.readyState !== 4)
-                return;
             if (request.status !== 200 && request.status !== 304)
             {
-
-                alert('HTTP error ' + request.status);
-                return;
+                if (this._getResponseError === false) {
+                    alert('HTTP error ' + request.status + ' ' + request.response);
+                    return;
+                    console.log(request)
+                }
             }
-            const [resultState, resultData]=JSON.parse(request.responseText);
-            console.log([targeturl,instance, params, resultState, resultData, callbackparam])
-            if (callbackparam!==null) {
-                instance.callCallbackFunctions(resultState,resultData, callbackparam)
+            if (this._subscriptionCallWord!==null) {
+                SubscriptionHandler.initSubscription(this._subscriptionCallWord, resultData, request.status)
             }
         };
         if (request.readyState === 4)
             return;
+
         if (this._postFields === null)
         {
+
             request.send()
         }
         else
-            request.send(this._postFields);
+            request.send(JSON.stringify(this._postFields));
     }
 
 

@@ -15,6 +15,7 @@ class FrameWorkCore
 
     public function run()
     {
+
         $this->router=backend\service\RoutingInitiator::getInstance();
         $this->router->run();
     }

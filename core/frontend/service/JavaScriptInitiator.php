@@ -20,11 +20,11 @@ class JavaScriptInitiator
     /**
      * JavaScriptInitiator constructor.
      */
-    public function __construct(?RequestParameters $params=null)
+    public function __construct(string $pageToLoad, ?RequestParameters $params=null)
     {
         $this->requestParameters=$params;
         $this->model = new JavascriptInitiatorModel();
-        $this->model->setPage($params->getUrlParameters()[0]);
+        $this->model->setPage($pageToLoad);
     }
 
     public function prepare()
@@ -71,7 +71,6 @@ class JavaScriptInitiator
     public function initJSCore()
     {
         $corefiles = $this->model->getFilesToLoad();
-            var_dump($corefiles);
         foreach ($corefiles as $value)
         {
             ?>
@@ -88,7 +87,4 @@ class JavaScriptInitiator
         </script>
         <?php
     }
-
-
-
 }

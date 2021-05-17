@@ -1,9 +1,9 @@
 class SearchEngineModel{
-    get quantity() {
-        return this._quantity;
+    get limit() {
+        return this._limit;
     }
-    set skip(value) {
-        this._skip = value;
+    set offset(value) {
+        this._offset = value;
     }
 
 
@@ -11,7 +11,7 @@ class SearchEngineModel{
 
     setPrevCrit() {
         this._prevCrit[0] = JSON.stringify(this._crit);
-        this._prevCrit[1] = this._quantity;
+        this._prevCrit[1] = this._limit;
     }
 
     getPrevCrit() {
@@ -46,7 +46,7 @@ class SearchEngineModel{
     setNewCrit() {
 
         this._newCrit[0]= JSON.stringify(this._crit);
-        this._newCrit[1]= this._quantity;
+        this._newCrit[1]= this._limit;
     }
 
     getNewCrit() {
@@ -54,15 +54,15 @@ class SearchEngineModel{
     }
 
 
-    _skip=0;
-    _quantity=10;
+    _offset=0;
+    _limit=10;
     _order="Title";
     _orderDir="ASC";
 
     setDefault()                      //kereső motor defaultra állítása
     {
-        this._skip=0;
-        this._quantity=10;
+        this._offset=0;
+        this._limit=10;
         this._order="Title";
         this._orderDir="ASC";
         this._crit={};
@@ -72,8 +72,8 @@ class SearchEngineModel{
     {
         return {
             criterium: JSON.stringify(this._crit),
-            skip: this._skip,
-            quantity: this._quantity,
+            offset: this._offset,
+            limit: this._limit,
             order: this._order,
             orderDir: this._orderDir
         };
@@ -84,6 +84,6 @@ class SearchEngineModel{
 
         this._order=sort;
         this._orderDir = dir;
-        this._quantity = quantity;
+        this._limit = quantity;
     }
 }

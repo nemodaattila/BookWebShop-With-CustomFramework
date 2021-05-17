@@ -5,8 +5,8 @@ JSCore.loadProjectFiles(
         files:[],
         namedModuls:[
             ['BookAttributes','CM'],
-        ['SearchEngine','CM'],
-        // ["LocalLibrary", 'CM'],
+            ['SearchEngine','CM'],
+            ["LocalLibrary", 'CM'],
         // ["BookThemeCategoryBrowser", "CMV"],
         // ["ContentHandler", "CMV"]
                 ],
@@ -18,8 +18,6 @@ JSCore.loadProjectFiles(
     }
 );
 
-// JSCoreController.loadModul('BookAttributes','BookAttributesModel', null);
-// JSCoreController.loadModul('SearchEngine','SearchEngineModel', null);
 // JSCoreController.loadSet('HTMLComponents/MainCategoryBrowser','HTMLComponents/MainCategoryBrowserModel','HTMLComponents/MainCategoryBrowserView')
 // JSCoreController.loadSet('HTMLComponents/SubcategoryBrowser','HTMLComponents/SubcategoryBrowserModel','HTMLComponents/SubcategoryBrowserView')
 // JSCoreController.loadModul("LocalLibrary",'LocalLibraryModel',null)

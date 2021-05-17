@@ -21,7 +21,7 @@ $view = ViewHandler::getInstance()
 <body>
 <header>
     <span id="titlediv">
-        <span><a href="index.php?target=index" >Könyvespolc.hu</a></span>
+        <span><a href="../../../../../databasetest/index.php" >Könyvespolc.hu</a></span>
         <img id="headimg" src="<?php echo ROOTURL;?>/project/frontend/globals/style/book-logo.jpg" >
     </span>
     <form id="loginform">
@@ -32,22 +32,22 @@ $view = ViewHandler::getInstance()
 <nav>
     <span>
         <span>
-            <a id="indexlink" href="index.php?target=index">Főoldal</a>
-            <a id="discountlink" href="index.php?target=discounts">Akciók</a>
-            <a id="newreleaselink" href="index.php?target=newreleases">Újdonságok</a>
+            <a id="indexlink" href="../../../../../databasetest/index.php">Főoldal</a>
+            <a id="discountlink" href="../../../../../databasetest/index.php">Akciók</a>
+            <a id="newreleaselink" href="../../../../../databasetest/index.php">Újdonságok</a>
 
         </span>
         <span id="rightdiv">
-            <a id="aboutuslink" href="index.php?target=aboutus">Rólunk</a>
-            <a id="shopaccesslink" href="index.php?target=shopaccess">Elérhetőség</a>
-            <a id="faqlink" href="index.php?target=faq">Kérdések - Észrevételek</a>
+            <a id="aboutuslink" href="../../../../../databasetest/index.php">Rólunk</a>
+            <a id="shopaccesslink" href="../../../../../databasetest/index.php">Elérhetőség</a>
+            <a id="faqlink" href="../../../../../databasetest/index.php">Kérdések - Észrevételek</a>
         </span>
     </span>
     <span id=bookmanagenav></span>
     <span>
-        <a href="index.php?target=browse" id="browselink">Böngészés</a>
-        <form method="POST" action="index.php?target=browse"><label for="quicksearch">Egyszerű keresés (író vagy cím):&nbsp;</label><input id="quicksearch" name="quicksearch" type="text"><input type="submit" value="keresés"></form>
-        <a id="complexsearchlink" href="index.php?target=searchbooks">Részletes keresés</a>
+        <a href="../../../../../databasetest/index.php" id="browselink">Böngészés</a>
+        <form method="POST" action="../../../../../databasetest/index.php"><label for="quicksearch">Egyszerű keresés (író vagy cím):&nbsp;</label><input id="quicksearch" name="quicksearch" type="text"><input type="submit" value="keresés"></form>
+        <a id="complexsearchlink" href="../../../../../databasetest/index.php">Részletes keresés</a>
     </span>
 </nav>
 
@@ -59,8 +59,8 @@ $view = ViewHandler::getInstance()
 <footer>
     <header>Készítette: Nemoda Attila<br/></header>
     <aside>
-        <a href="index.php?target=aboutme" id="aboutmelink">Magamról - A készítőról</a>
-        <a href="index.php?target=aboutpage" id="aboutpagelink">Az oldalról</a>
+        <a href="../../../../../databasetest/index.php" id="aboutmelink">Magamról - A készítőról</a>
+        <a href="../../../../../databasetest/index.php" id="aboutpagelink">Az oldalról</a>
         <a href="#top" onclick="self.scrollTo(0, 0); return false;">Oldal Tetejére</a>
     </aside>
 
