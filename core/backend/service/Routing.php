@@ -3,8 +3,9 @@ namespace core\backend\service;
 use core\backend\helper\VariableHelper;
 use core\backend\model\RequestParameters;
 use core\backend\model\RequestResultException;
-use mysql_xdevapi\Exception;
 use core\backend\interfaces\IRestInterface;
+use Error;
+use Exception;
 
 /**
  * Class Routing a request alapján az útvonal betültését és meghívását intézi
@@ -195,7 +196,7 @@ final class Routing
                         $this->sendResponse(500, $e->getMessage(), $route['response_is_json']);
 
                     }
-                    catch (\Error $e)
+                    catch (Error $e)
                     {
                         $this->sendResponse(500, $e->getMessage(), $route['response_is_json']);
                     }

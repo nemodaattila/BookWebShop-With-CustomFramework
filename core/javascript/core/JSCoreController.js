@@ -14,6 +14,7 @@ class JSCoreController
         this._model = value;
     }
 
+
     initCore() {
         this.addNoScript();
         this.initIncludeHelper();
@@ -73,7 +74,8 @@ class JSCoreController
         for (let file of files)
         {
             let [path, fileName] = file;
-            this.model.addFilesToLoad([fileName],path, 1 )
+            path = this._model.javascriptUrl + path;
+            this._includer.addFilesToLoad([fileName+'.js'],path, 1 )
         }
     }
 
@@ -119,9 +121,9 @@ class JSCoreController
             let controller = settings.indexOf("C") !== -1? name : null;
             let model = settings.indexOf("M") !== -1? name+'Model' : null;
             let view = settings.indexOf("V") !== -1? name+'View' : null;
-            this._includer.addFilesToLoad([controller],this._model.javascriptUrl+'controller',1)
-            if (model) this._includer.addFilesToLoad([model],this._model.javascriptUrl+'model',1)
-            if (view) this._includer.addFilesToLoad([view],this._model.javascriptUrl+'view',1)
+            this._includer.addFilesToLoad([controller],this._model.javascriptUrl+'controller/',1)
+            if (model) this._includer.addFilesToLoad([model],this._model.javascriptUrl+'model/',1)
+            if (view) this._includer.addFilesToLoad([view],this._model.javascriptUrl+'view/',1)
         }
     }
     //

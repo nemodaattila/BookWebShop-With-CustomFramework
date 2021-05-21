@@ -60,4 +60,15 @@ class SimplePDOProcessorParent
     {
         $this->pdo = $pdo;
     }
+
+    public function execute()
+    {
+        $query = $this->pdo->prepare($this->getCommand());
+        $success = $query->execute($this->getValues());
+        if ($success === false)
+        {
+            throw new RequestResultException(500, ['errorcode'=>'PDOSSSF', 'errorMessage'=>$this->getCommand()]);
+        }
+        return $success;
+    }
 }
