@@ -46,13 +46,18 @@ class BookAttributes extends ControllerParent{
         console.log(attribs)
         console.log(typeof attribs.date)
         localStorage.setItem('bookAttribs', JSON.stringify(attribs))
+        SubscriptionHandler.initSubscription('bookAttribsLoaded', [], 200)
     }
 
     //DO get minden attribnak
     getCategories()
     {
-        console.log(this.model.category)
-        return this.model.category;
+        return {'main':this.model.mainCategory, 'sub':this.model.subCategory};
+    }
+
+    getType()
+    {
+        return this.model.type;
     }
 
 }

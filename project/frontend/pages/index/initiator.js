@@ -1,8 +1,8 @@
 let il=document.getElementById("browselink");
 il.setAttribute("aria-current","page");
 
-// VSM.call("BookThemeCategoryBrowser","setContainerHTMLElement", "catNav");
-// VSM.call("ContentHandler","setContainerHTMLElement", "mainBookDiv");
+new BookPrimaryViewer().setContainerHTMLElement("mainBookDiv")
+new BookThemeCategoryBrowser().setContainerHTMLElement("catNav")
 // ContentHandler.setBookButtonAction('AddToCartButton')
 // PageNavigator.setContainerHtmlElement("pageNav");
 // SearchEngine.addCriteriumSourceObject(PageNavigator);

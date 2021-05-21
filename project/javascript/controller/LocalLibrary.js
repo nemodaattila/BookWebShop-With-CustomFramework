@@ -10,32 +10,46 @@ class LocalLibrary extends ControllerParent {
 
     init()
     {
-        SubscriptionHandler.subscribe("getBooks", this, "checkListInLocal")
+        SubscriptionHandler.subscribe("getBooks", this, "checkListInLocalLibrary")
+        SubscriptionHandler.subscribe("primaryBookData", this, "addBookPrimaryToLocalLibrary")
+        this.fillBookSfromLocalStorage();
     }
 
-    checkListInLocal(isbnList)
+    fillBookSfromLocalStorage()
+    {
+        let localLibrary = localStorage.getItem('localLibrary');
+        console.log('!!!!!!!!')
+        // localLibrary=null;
+        if (localLibrary !== null)
+        {
+            this.model.fillBooksFromObjectLessThenOneDay(JSON.parse(localLibrary));
+            console.log(this.model.book)
+            this.saveLocalLibraryToLocalStorage();
+        }
+        console.log('!!!!!!!!')
+    }
+
+    getOneBookPrimary(isbn)
+    {
+        return this.model.getOneBookPrimaryData(isbn)
+    }
+
+    checkListInLocalLibrary(isbnList)
     {
         console.log(isbnList)
-        this.checkIsbnInLocal(isbnList['list'][0])
-        // for (let isbn of isbnList['list'])
-        // {
-        //     this.checkIsbnInLocal(isbn)
-        // }
+        // this.checkIsbnInLocalLibrary(isbnList['list'][0])
+        for (let isbn of isbnList['list'])
+        {
+            this.checkIsbnInLocalLibrary(isbn)
+        }
     }
 
-    checkIsbnInLocal(isbn)
+    checkIsbnInLocalLibrary(isbn)
     {
-        let bookData = localStorage.getItem(isbn);
-        let timeStamp
-        if (bookData !== null)
+        let data = this.model.checkBookInLibrary(isbn)
+        if (data === undefined)
         {
-            bookData=JSON.parse(bookData)
-            let acttime=new Date()
-            timeStamp=(acttime.getTime()-bookData.timeStamp.getTime())
-        }
-
-        if (bookData === null || timeStamp>3600000)
-        {
+            console.log('BOOKNOTINLOCAL')
             let ac = new AjaxCaller()
             ac.targetUrl = JSCore.getRoot()+"/book/primaryData/"+isbn;
             ac.requestType = 'GET';
@@ -43,7 +57,18 @@ class LocalLibrary extends ControllerParent {
             console.log(ac)
             ac.send();
         }
+    }
 
+    addBookPrimaryToLocalLibrary(bookData)
+    {
+        this.model.addBookWithPrimaryData(bookData['isbn'], bookData)
+        this.saveLocalLibraryToLocalStorage()
+        SubscriptionHandler.initSubscription('primaryDataArrived', bookData['isbn'], 200)
+    }
+
+    saveLocalLibraryToLocalStorage()
+    {
+        localStorage.setItem('localLibrary', JSON.stringify(this.model.book));
     }
 
 }

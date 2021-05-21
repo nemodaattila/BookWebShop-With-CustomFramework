@@ -18,7 +18,7 @@ class BookMetaDataDBHandler
             'subCategory'=>$this->getSubCategory(),
             'tag'=>$this->getTag(),
             'targetAudience'=>$this->getTargetAudience(),
-            'type'=>$this->getType()
+            'type'=>$this->getType(),
         ];
     }
 

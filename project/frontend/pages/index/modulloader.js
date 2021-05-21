@@ -2,18 +2,21 @@ console.log('modulloader');
 
 JSCore.loadProjectFiles(
     {
-        files:[],
+        files:[['model\\','LocalLibraryBookModel'],
+            ['model\\','LocalLibraryBookPrimaryModel'],
+            ['model\\','LocalLibraryBookSecundaryModel']
+        ],
         namedModuls:[
             ['BookAttributes','CM'],
             ['SearchEngine','CM'],
             ["LocalLibrary", 'CM'],
-        // ["BookThemeCategoryBrowser", "CMV"],
-        // ["ContentHandler", "CMV"]
+            ["BookThemeCategoryBrowser", "CMV"],
+            ["BookPrimaryViewer", "C"]
                 ],
         namedSets: [
-        // ['HTMLComponents/MainCategoryBrowser', 'CMV'],
+        ['MainCategoryBrowser', 'CMV'],
         // ['HTMLComponents/SubcategoryBrowser','CMV'],
-        // ['HTMLComponents/IndividualBookDiv',"CV"]
+        ['IndividualBookPrimaryDataDisplayer',"CV"]
     ]
     }
 );
