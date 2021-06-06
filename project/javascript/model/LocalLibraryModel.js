@@ -1,57 +1,68 @@
+/**
+ * az összes eddig megjelenített könyv adatait tartalmazza
+ */
 class LocalLibraryModel {
-    get book() {
-        return this._book;
+
+    /**
+     * könyvek adatmodellje, LocalLibraryBookModel-leket tartalmaz
+     * @type {{}}
+     * * @private
+     */
+    _books = {};
+    get books() {
+        return this._books;
     }
 
-    set book(value) {
-        this._book = value;
-    }
-    _book={};
-
-    checkBookInLibrary(isbn)
-    {
-        let prop = isbn
-        return this._book[isbn];
+    set books(value) {
+        this._books = value;
     }
 
-    addBookWithPrimaryData(isbn, data)
-    {
-        this._book[isbn] = new LocalLibraryBookModel();
-        this._book[isbn].primaryData=data;
-        this._book[isbn].timeStamp=new Date()
-        console.log(this._book)
+    /**
+     * megnézi, az adatt isbn-nel létezik-e könyv
+     * @param isbn a könyv isbn-je
+     * @returns LocalLibraryBookModel
+     */
+    checkBookInLibrary(isbn) {
+        return this._books[isbn];
     }
 
-    getOneBookPrimaryData(isbn)
-    {
-        console.log(isbn)
-        console.log(this._book[isbn])
-        if (this._book[isbn] === undefined)
+    /**
+     * létrehoz egy LocalLibraryBookModel objektetm és hozzáadja a primary adatokat
+     * @param isbn könyv isbn-je egyben index
+     * @param data a primary adatok
+     */
+    addBookWithPrimaryData(isbn, data) {
+        this._books[isbn] = new LocalLibraryBookModel();
+        this._books[isbn].primaryData = data;
+        this._books[isbn].timeStamp = new Date()
+    }
+
+    /**
+     * egy könyv primary adatait adja vissza, ha nem létezik null
+     * @param isbn könyv isbn-je
+     * @returns {null|LocalLibraryBookPrimaryModel}
+     */
+    getOneBookPrimaryData(isbn) {
+        if (this._books[isbn] === undefined)
             return null;
-        return this._book[isbn]['primaryData']
-
+        return this._books[isbn]['primaryData']
     }
 
-    fillBooksFromObjectLessThenOneDay(books)
-    {
-        let acttime=new Date()
+    /**
+     * LocalStorage-ből lekérdezett könyvadatokból betölti azokat melyek 1 napnál nem régebbiek
+     * @param books array
+     */
+    fillBooksFromObjectLessThenOneDay(books) {
+        let actTime = new Date()
         let keys = Object.keys(books)
-        for (let isbn of keys)
-        {
-            console.log(isbn);
-            let timeStamp=(acttime.getTime()-new Date(books[isbn]['_timeStamp']).getTime())
-            console.log(timeStamp)
-                if (timeStamp < 3600000)
-                {
-                this._book[isbn] = new LocalLibraryBookModel();
-                this._book[isbn].primaryData = books[isbn]['_primaryData'];
-                this._book[isbn].secundaryData = books[isbn]['_secundaryData'];
-                this._book[isbn].timeStamp = new Date(books[isbn]['_timeStamp']);
+        for (let isbn of keys) {
+            let timeStamp = (actTime.getTime() - new Date(books[isbn]['_timeStamp']).getTime())
+            if (timeStamp < 3600000) {
+                this._books[isbn] = new LocalLibraryBookModel();
+                this._books[isbn].primaryData = books[isbn]['_primaryData'];
+                this._books[isbn].secundaryData = books[isbn]['_secondaryData'];
+                this._books[isbn].timeStamp = new Date(books[isbn]['_timeStamp']);
             }
-            console.log(this._book)
-
-            // console.log(this._book[book].timeStamp)
         }
-        console.log(this._book)
     }
 }

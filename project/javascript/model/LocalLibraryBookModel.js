@@ -1,7 +1,25 @@
+/**
+ * egy könyv modelje a LocalLibrary-ben
+ */
 class LocalLibraryBookModel {
 
+    /**
+     * könyv elsődleges adatait tartalmazó modell
+     * @private LocalLibraryBookPrimaryModel
+     */
     _primaryData;
-    _secundaryData;
+
+    /**
+     * könyv elsődleges adatait tartalmazó modell
+     * @private LocalLibraryBookSecondaryModel
+     */
+    _secondaryData;
+
+    /**
+     * utolsó adatmódosítási idő
+     * @private
+     */
+    _timeStamp;
 
     get primaryData() {
         return this._primaryData;
@@ -11,15 +29,13 @@ class LocalLibraryBookModel {
         this._primaryData = new LocalLibraryBookPrimaryModel(value);
     }
 
-    get secundaryData() {
-        return this._secundaryData;
+    get secondaryData() {
+        return this._secondaryData;
     }
 
-    set secundaryData(value) {
-        this._secundaryData = new LocalLibraryBookSecundaryModel();
+    set secondaryData(value) {
+        this._secondaryData = new LocalLibraryBookSecondaryModel();
     }
-
-    _timeStamp;
 
     get timeStamp() {
         return this._timeStamp;

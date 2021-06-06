@@ -1,31 +1,56 @@
-class MainCategoryBrowserModel{
-    // get categories() {
-    //     return this._categories;
-    // }
-    //
-    // set categories(value) {
-    //     this._categories = value;
-    // }
-    // _categories = [];
-    //
-    // _subcategoryBrowsers =[];
-    // addSubcategoryBrowser(name, categories, relativeHtmlelement)
-    // {
-    //     this._subcategoryBrowsers[name]=new SubcategoryBrowser(categories, relativeHtmlelement);
-    // }
-    //
-    // removeSubcategoryBrowser(name)
-    // {
-    //     this._subcategoryBrowsers[name].removeView();
-    //     delete this._subcategoryBrowsers[name];
-    // }
+/**
+ * kategória böngésző főkategória modell
+ */
+class MainCategoryBrowserModel {
 
+    /**
+     * alkategóriák listája
+     * @private object
+     */
     _subCategories;
+
+    /**
+     * főkategória ID
+     * @private int
+     */
     _id;
 
+    /**
+     * főkategória neve/szövege
+     * @private string
+     */
+    _label;
 
-    constructor(subCategories, id) {
+    /**
+     * mutatja e az alkategóriákat
+     * @type {boolean}
+     * @private
+     */
+    _subCategoriesShown = false;
+
+    get subCategoriesShown() {
+        return this._subCategoriesShown;
+    }
+
+    set subCategoriesShown(value) {
+        this._subCategoriesShown = value;
+    }
+
+    constructor(label, id, subCategories) {
         this._subCategories = subCategories;
         this._id = id;
+        this._label = label;
+    }
+
+    get label() {
+        return this._label;
+    }
+
+    get id() {
+        return this._id;
+    }
+
+    get subCategories() {
+        return this._subCategories;
     }
 }

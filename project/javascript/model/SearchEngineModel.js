@@ -1,13 +1,68 @@
-class SearchEngineModel{
+class SearchEngineModel {
+
+    /**
+     * keresési eltolás pl-: 2.oldal
+     * @type {number}
+     * @private
+     */
+    _offset = 0;
+
+    /**
+     * hány darab maximum
+     * @type {number}
+     * @private
+     */
+    _limit = 10;
+
+    /**
+     * rendezési paraméter
+     * @type {string}
+     * @private
+     */
+    _order = "Title";
+
+    /**
+     * rendezés iránya
+     * @type {string}
+     * @private
+     */
+    _orderDir = "ASC";
+
+    /**
+     * előző keresési paraméter LocalOrdering összehasonlításhoz
+     * @type {[]}
+     * @private
+     */
+    _prevCrit = [];
+
+    /**
+     * új keresési paraméter  LocalOrdering összehasonlításhoz
+     * @type {[]}
+     * @private
+     */
+    _newCrit = [];
+
+    /**
+     * keresési paraméterek kereséshez
+     * @type {{}}
+     * @private
+     */
+    _crit = {};
+
+    /**
+     * objektumok melyek befolyásolják a keresést
+     * @type {[]}
+     * @private
+     */
+    _criteriumSourceObject = [];
+
     get limit() {
         return this._limit;
     }
+
     set offset(value) {
         this._offset = value;
     }
-
-
-    _prevCrit=[];
 
     setPrevCrit() {
         this._prevCrit[0] = JSON.stringify(this._crit);
@@ -18,8 +73,6 @@ class SearchEngineModel{
         return this._prevCrit;
     }
 
-    _criteriumSourceObject=[];
-
     get criteriumSourceObject() {
         return this._criteriumSourceObject;
     }
@@ -28,11 +81,9 @@ class SearchEngineModel{
         this._criteriumSourceObject.push(value);
     }
 
-
-    _crit={};
-    setCrit(type,value)               //keresési kritérium beállítása
+    setCrit(type, value)               //keresési kritérium beállítása
     {
-        this._crit[type]=value;
+        this._crit[type] = value;
 
     };
 
@@ -41,35 +92,32 @@ class SearchEngineModel{
         delete this._crit[type]
     };
 
-    _newCrit=[];
-
     setNewCrit() {
 
-        this._newCrit[0]= JSON.stringify(this._crit);
-        this._newCrit[1]= this._limit;
+        this._newCrit[0] = JSON.stringify(this._crit);
+        this._newCrit[1] = this._limit;
     }
 
     getNewCrit() {
         return this._newCrit;
     }
 
-
-    _offset=0;
-    _limit=10;
-    _order="Title";
-    _orderDir="ASC";
-
-    setDefault()                      //kereső motor defaultra állítása
-    {
-        this._offset=0;
-        this._limit=10;
-        this._order="Title";
-        this._orderDir="ASC";
-        this._crit={};
+    /**
+     * alapértelmezésre állítás
+     */
+    setDefault() {
+        this._offset = 0;
+        this._limit = 10;
+        this._order = "Title";
+        this._orderDir = "ASC";
+        this._crit = {};
     };
 
-    getSearchParams()
-    {
+    /**
+     * keresési paraméterek visszadása
+     * @returns {{offset: number, criterium: string, limit: number, orderDir: string, order: string}}
+     */
+    getSearchParams() {
         return {
             criterium: JSON.stringify(this._crit),
             offset: this._offset,
@@ -79,10 +127,14 @@ class SearchEngineModel{
         };
     }
 
-    setOrderAndCount(sort, dir, quantity)
-    {
-
-        this._order=sort;
+    /**
+     * sorrendezés és limit beállítása
+     * @param sort
+     * @param dir
+     * @param quantity
+     */
+    setOrderAndCount(sort, dir, quantity) {
+        this._order = sort;
         this._orderDir = dir;
         this._limit = quantity;
     }

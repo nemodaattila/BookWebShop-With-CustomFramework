@@ -1,37 +1,54 @@
+/**
+ * kategória böngésző modellje
+ */
 
 class BookThemeCategoryBrowserModel
 {
+    /**
+     * lehetséges kategóriák
+     * @type {[]}
+     */
+    _categories=[];
 
-    categories=[];
-    type;
-    typeValue;
+    /**
+     *  kereséshez kiválasztott kategória tipusa (Maincategory/Category)
+     * ha már rákattintot a linkre
+     * @private string
+     */
+    _type;
 
-    setCategories=function (cats) {
-        console.log(cats)
-        this.categories=cats;
+    /**
+     *  kereséshez kiválasztott kategória értéke/kódja
+     * ha már rákattintot a linkre
+     * @private int
+     */
+    _typeValue;
+
+    setCategories(cats) {
+        this._categories=cats;
     }
 
-    getCategories=function () {
-        return this.categories;
+    getCategories() {
+        return this._categories;
     }
 
-    setType=function(value)
+    setType(value)
     {
-        this.type=value;
+        this._type=value;
     }
 
-    getType=function()
+    getType()
     {
-        return this.type;
+        return this._type;
     }
 
-    setTypeValue=function(value)
+    setTypeValue(value)
     {
-        this.typeValue=value;
+        this._typeValue=value;
     }
 
-    getTypeValue=function()
+    getTypeValue()
     {
-        return this.typeValue;
+        return this._typeValue;
     }
 }

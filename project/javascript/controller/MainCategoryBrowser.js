@@ -1,60 +1,63 @@
-class MainCategoryBrowser{
+/**
+ * főkategória megjelenítéésrt felelős controller
+ */
+
+class MainCategoryBrowser {
 
     _model;
     _view;
+    /**
+     * alkategóriák objektumai
+     * @type {{}}
+     * @private
+     */
+    _subCategories = {}
 
-    constructor(category, key) {
+    constructor(label, key, subCategories) {
         this._view = new MainCategoryBrowserView()
-        this._model = new MainCategoryBrowserModel(category, key)
+        this._model = new MainCategoryBrowserModel(label, key, subCategories)
     }
 
-    setContainerHTMLElement(element)
-    {
-        this._view.setContainerHTMLElement(element)
+    /**
+     * megjelenítő DOM elem megadása
+     */
+    setContainerHTMLElement(element) {
+        this._view.setContainerHtmlElement(element)
     }
 
-    displayMainCategories()
-    {
-
-        this.view.displayBrowser(Object.keys(this.model.categories))
+    /**
+     * kategória megjelenítése
+     */
+    displayMainCategory() {
+        this._view.displayBrowser(this._model.label)
         this.addEventsToElements();
     }
 
-    // addEventsToElements() {
-    //     console.log(this.view.allsearch)
-    //     this.view.allsearch.addEventListener("click",()=>{
-    //         BookThemeCategoryBrowser.callCallbackFunctions('SUCCESS', null, 'prepareAllSearch')
-    //     });
-    //     for (let key of this.view.searchLinks)
-    //     {
-    //         key.addEventListener("click",(event)=>
-    //         {
-    //             VSM.call("BookThemeCategoryBrowser", 'prepareMainSearch', event.target.innerHTML,)
-    //         })
-    //     }
-    //     console.log(this);
-    //     for (let key of this.view.openButtons)
-    //     {
-    //         key.addEventListener("click",(event)=>
-    //         {
-    //
-    //             console.log(event);
-    //             let sublinks;
-    //             const button=event.target;
-    //             let subcategoryName = button.nextSibling.innerHTML;
-    //             if (button.value==="+")
-    //             {
-    //                 console.log(this.model.categories[subcategoryName])
-    //                 this.model.addSubcategoryBrowser(subcategoryName, this.model.categories[subcategoryName], button)
-    //                 button.value='-';
-    //             }
-    //             else
-    //             {
-    //                 this.model.removeSubcategoryBrowser(subcategoryName)
-    //                 button.value='+';
-    //             }
-    //             console.log(this.model);
-    //         })
-    //     }
-    // }
+    /**
+     * esemény hozzáadása gombokhoz
+     * keresési esemény, alkategória megjelenítés/elrejtés esemény
+     */
+    addEventsToElements() {
+        this._view.searchLink.addEventListener('click', () => {
+            EventSubscriptionHandler.triggerSubscriptionCall('mainCategorySearch', this._model.id, 200)
+        })
+        this._view.openButton.addEventListener('click', () => {
+            let isOpen = this._model.subCategoriesShown;
+            if (isOpen === true) {
+                this._view.hideSubcategories();
+                this._view.changeOpenSign(false)
+                this._model.subCategoriesShown = false;
+            } else {
+                if (Object.keys(this._subCategories).length === 0) {
+                    for (let key in this._model.subCategories) {
+                        if (this._model.subCategories.hasOwnProperty(key))
+                            this._subCategories[key] = new SubcategoryBrowser(key, this._model.subCategories[key], this._view.subCategoryContainer);
+                    }
+                }
+                this._view.showSubcategories();
+                this._view.changeOpenSign(true)
+                this._model.subCategoriesShown = true;
+            }
+        })
+    }
 }

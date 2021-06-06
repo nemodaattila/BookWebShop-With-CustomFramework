@@ -1,45 +1,94 @@
-class MainCategoryBrowserView{
-    get allsearch() {
-        return this._allsearch;
-    }
+/**
+ * kategória böngésző főkategória view-je
+ */
+class MainCategoryBrowserView {
 
-    get searchLinks() {
-        return this._searchLinks;
-    }
-
-    get openButtons() {
-        return this._openButtons;
-    }
-
+    /**
+     * tartalmazó DOM element
+     * @private
+     */
     _containerElement;
-    _allsearch;
-    _searchLinks=[];
-    _openButtons=[];
 
-    setContainerHtmlElement(element) {
-        console.log(element)
-        this._containerElement=document.getElementById(element);
-        console.log(this._containerElement)
+    /**
+     * link melyre kattintva keresni lehet
+     * @private
+     */
+    _searchLink;
+
+    /**
+     * alkateória nyitó/záró gomb
+     * @private
+     */
+    _openButton;
+
+    /**
+     * alkategória DOM eleme
+     * @private
+     */
+    _subCategoryContainer;
+
+    get subCategoryContainer() {
+        return this._subCategoryContainer;
     }
 
-    displayBrowser(categories)
-    {
-        console.log(categories)
-        let list=document.createElement("ul");
-        this._containerElement.appendChild(list);
-        this._allsearch=HtmlElementCreator.createHtmlElement(["li","span"],list,{"innerHTML":"Összes",class:"searchLink"});
+    get searchLink() {
+        return this._searchLink;
+    }
 
-        for (let key of categories)
-        {
-            let item=HtmlElementCreator.createHtmlElement("li",list,{});
-            let openButton=HtmlElementCreator.createHtmlElement("input",item,{"type":"button", class:"openButton", "value":"+"});
-            this._openButtons.push(openButton);
-            //"onclick":"BookThemeCategoryBrowser.manageSubCategories()"
-            let searchLink = HtmlElementCreator.createHtmlElement("span",item,{ class:"searchLink", "innerHTML": key});
+    get openButton() {
+        return this._openButton;
+    }
 
-            //t.onclick=(event)=>{console.dir(event);this.prepareMainSearch(event.target)};
-            this._searchLinks.push(searchLink);
-        }
+    /**
+     * tartalmazó DOM element beállítása
+     * @param element
+     */
+    setContainerHtmlElement(element) {
+        this._containerElement = element;
+    }
+
+    get containerElement() {
+        return this._containerElement;
+    }
+
+    /**
+     * alkategóriák elrejtése
+     */
+    hideSubcategories() {
+        this._subCategoryContainer.hidden = true;
+    }
+
+    /**
+     * alkategóriák újramegjelenítése
+     */
+    showSubcategories() {
+        this._subCategoryContainer.hidden = false;
+    }
+
+    /**
+     * főkategória megjelenítése
+     * @param label
+     */
+    displayBrowser(label) {
+        let item = HtmlElementCreator.createHtmlElement("li", this._containerElement, {});
+        this._openButton = HtmlElementCreator.createHtmlElement("input", item, {
+            "type": "button",
+            class: "openButton",
+            "value": "+"
+        });
+        this._searchLink = HtmlElementCreator.createHtmlElement("span", item, {
+            class: "searchLabel",
+            "innerHTML": label
+        });
+        this._subCategoryContainer = HtmlElementCreator.createHtmlElement("ul", item, {'hidden': true});
+    }
+
+    /**
+     * alkategória nyitó/ záró gomb jelének változtatása
+     * @param value
+     */
+    changeOpenSign(value) {
+        this._openButton.value = (value === true) ? '-' : '+';
     }
 
 }
