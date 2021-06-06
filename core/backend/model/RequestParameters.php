@@ -1,55 +1,56 @@
 <?php
 
-
 namespace core\backend\model;
-
 
 use core\backend\interfaces\IConvertableToArrayInterface;
 
+/**
+ * Class RequestParameters http request paraméterei mentődnek le ide
+ * @package core\backend\model
+ */
 class RequestParameters implements IConvertableToArrayInterface
 {
+    /**
+     * @var array http request url paraméterei
+     */
     private array $urlParameters;
+    /**
+     * @var array http request bodyból származó paraméterek
+     */
     private array $requestData;
 
-    /**
-     * @param string $urlParameter
-     */
     public function addUrlParameter(string $urlParameter): void
     {
         $this->urlParameters[] = $urlParameter;
     }
 
-    /**
-     * @param array $requestData
-     */
     public function setRequestData(array $requestData): void
     {
         $this->requestData = $requestData;
     }
 
-    /**
-     * @return array
-     */
     public function getUrlParameters(): array
     {
         return $this->urlParameters;
     }
 
-    /**
-     * @return array
-     */
     public function getRequestData(): array
     {
         return $this->requestData;
     }
 
+    /**
+     * paraméterek törlése
+     */
     public function reset()
     {
-        $this->urlParameters=[];
-        $this->requestData=[];
+        $this->urlParameters = [];
+        $this->requestData = [];
     }
 
-
+    /**
+     * @return array összes paraméter array formában
+     */
     public function getAlldata(): array
     {
         return get_object_vars($this);

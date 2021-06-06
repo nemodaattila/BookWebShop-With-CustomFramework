@@ -1,4 +1,5 @@
 <?php
+
 namespace core\backend\database;
 
 use PDO;
@@ -7,7 +8,8 @@ use PDO;
  * Class PDOConnection osztály PDO kapcsolat létesítéséhez
  * @package backend
  */
-final class PDOConnection {
+final class PDOConnection
+{
     /**
      * @var PDO|null PDO egyke példánya
      */
@@ -17,7 +19,8 @@ final class PDOConnection {
      * visszaad egy PDO-t, ha nincs létrehozza
      * @return PDO a visszadott PDO
      */
-    public static function getInstance(): PDO {
+    public static function getInstance(): PDO
+    {
         if (self::$dbSingleton == null) {
 
             self::$dbSingleton = self::createPDO();
@@ -26,12 +29,12 @@ final class PDOConnection {
     }
 
     /**
-     * létrehoz egy PDO pélányt a config/PDOconfig.php alappján
-     * @return PDO
+     * létrehoz egy PDO pélányt a \project\config\PDOconfig.php alapján
+     * @return PDO PDO kapcsolat
      */
-    private static function createPDO() :PDO
+    private static function createPDO(): PDO
     {
-        $config = parse_ini_file(ROOT.'\project\config\PDOConfig.php');
+        $config = parse_ini_file(ROOT . '\project\config\PDOConfig.php');
         return new PDO("mysql:host=" . $config['dbHost'] . ";dbname=" . $config['dbName']
             . ";charset=utf8", $config['dbUser'], $config['dbPassword'], [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION

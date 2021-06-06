@@ -1,12 +1,17 @@
 <?php
 
-
 namespace core\backend\model;
 
+use core\backend\service\WebPageGenerator;
 
+/**
+ * Class WebPageConfig weboldal betöltéséhez, megjelenítéséhez szükséges fájlokneveket, adatokat tároló segédosztály
+ * @package core\backend\model
+ * @see WebPageGenerator
+ */
 class WebPageConfig
 {
-    private static ?WebPageConfig $instance=null;
+    private static ?WebPageConfig $instance = null;
 
     public static function getInstance(): WebPageConfig
     {
@@ -16,19 +21,16 @@ class WebPageConfig
         return self::$instance;
     }
 
+    /**
+     * @var string megjelenítendő layout view
+     */
     private string $layout = 'default';
 
-    /**
-     * @return string
-     */
     public function getLayout(): string
     {
         return $this->layout;
     }
 
-    /**
-     * @param string $layout
-     */
     public function setLayout(string $layout): void
     {
         $this->layout = $layout;
@@ -40,7 +42,7 @@ class WebPageConfig
     private bool $javaScriptEnabled = false;
 
     /**
-     * @var bool ha van javascript, betötlse e a javascript ajax kezelőt
+     * @var bool ha van javascript, betöltse e a javascript ajax/httprequest kezelőt kezelőt
      */
     private bool $ajaxEnabled = false;
 
@@ -64,104 +66,64 @@ class WebPageConfig
      */
     private string $dataBaseType = 'PDO';
 
-
-    /**
-     * @return bool
-     */
     public function isDataBaseEnabled(): bool
     {
         return $this->dataBaseEnabled;
     }
 
-    /**
-     * @param bool $dataBaseEnabled
-     */
     public function setDataBaseEnabled(bool $dataBaseEnabled): void
     {
         $this->dataBaseEnabled = $dataBaseEnabled;
     }
 
-    /**
-     * @return string
-     */
     public function getDataBaseType(): string
     {
         return $this->dataBaseType;
     }
 
-    /**
-     * @param string $dataBaseType
-     */
     public function setDataBaseType(string $dataBaseType): void
     {
         $this->dataBaseType = $dataBaseType;
     }
 
-
-
-    /**
-     * @return bool
-     */
     public function isJavaScriptEnabled(): bool
     {
         return $this->javaScriptEnabled;
     }
 
-    /**
-     * @param bool $javaScriptEnabled
-     */
     public function setJavaScriptEnabled(bool $javaScriptEnabled): void
     {
         $this->javaScriptEnabled = $javaScriptEnabled;
     }
 
-    /**
-     * @return bool
-     */
     public function isAjaxEnabled(): bool
     {
         return $this->ajaxEnabled;
     }
 
-    /**
-     * @param bool $ajaxEnabled
-     */
     public function setAjaxEnabled(bool $ajaxEnabled): void
     {
         $this->ajaxEnabled = $ajaxEnabled;
     }
 
-    /**
-     * @return bool
-     */
     public function isSessionEnabled(): bool
     {
         return $this->sessionEnabled;
     }
 
-    /**
-     * @param bool $sessionEnabled
-     */
     public function setSessionEnabled(bool $sessionEnabled): void
     {
         $this->sessionEnabled = $sessionEnabled;
     }
 
-    /**
-     * @return bool
-     */
     public function isPassRequestParametersToJs(): bool
     {
         return $this->passRequestParametersToJs;
     }
 
-    /**
-     * @param bool $passRequestParametersToJs
-     */
     public function setPassRequestParametersToJs(bool $passRequestParametersToJs): void
     {
         $this->passRequestParametersToJs = $passRequestParametersToJs;
     }
-
 
 }

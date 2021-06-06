@@ -1,5 +1,47 @@
-class IncludeModel
-{
+/**
+ * model a JS fájlok includolsához (Include.js), bejegyzi az összes betöltendő fájlt, valamint a
+ * a betöltés állapotadatait
+ */
+class IncludeModel {
+    /**
+     * fut e a betöltési folyamat
+     * @type {boolean}
+     * @private
+     */
+    _active = false;
+
+    /**
+     *  aktuális betöltési szint, ha nem fut akkor -1
+     * @type {number}
+     * @private
+     */
+    _loadLevel = -1;
+    /**
+     * a betöltendő fájlok tömbje (multidimensonal)
+     * @type {[]}
+     * @private
+     */
+    _filesToLoad = [];
+
+    /**
+     * az adott szinten tartozó már töltésre előkészített fájlok
+     * @type {[]}
+     * @private
+     */
+    _preparedFilesForLoad = [];
+
+    /**
+     * az adott szinten hány fájl töltődött be
+     * @private
+     */
+    _progressFileCount;
+
+    /**
+     * adott szinten hány betöltendő fájlt van
+     * @private
+     */
+    _actualLevelFileCount;
+
     get actualLevelFileCount() {
         return this._actualLevelFileCount;
     }
@@ -7,6 +49,7 @@ class IncludeModel
     set actualLevelFileCount(value) {
         this._actualLevelFileCount = value;
     }
+
     get progressFileCount() {
         return this._progressFileCount;
     }
@@ -14,12 +57,6 @@ class IncludeModel
     set progressFileCount(value) {
         this._progressFileCount = value;
     }
-    _active=false;
-    _loadLevel=0;
-    _filesToLoad=[];
-    _preparedFilesForLoad=[];
-    _progressFileCount;
-    _actualLevelFileCount;
 
     get loadLevel() {
         return this._loadLevel;
@@ -28,6 +65,7 @@ class IncludeModel
     set loadLevel(value) {
         this._loadLevel = value;
     }
+
     get active() {
         return this._active;
     }
@@ -36,109 +74,57 @@ class IncludeModel
         this._active = value;
     }
 
-    getLevelCount()
-    {
+    getLevelCount() {
         return this._filesToLoad.length;
     }
 
-    set filesToLoad(params) {
-        let [files, path, level, callback] = params;
+    set filesToLoad([files, path, level, callback]) {
+        // let [files, path, level, callback] = params;
         if (this._filesToLoad === undefined) this._filesToLoad = [];
         if (this._filesToLoad[level] === undefined)
             this._filesToLoad[level] = [];
         this._filesToLoad[level].push([files, path, callback])
     }
+
     get filesToLoad() {
         return this._filesToLoad;
     }
 
-    prepareFilesForLoad()
-    {
+    /**
+     * adott szinten lévő fájlok előkészészítése betöltéshez (nem a fájlokat, hanem a neveiket készíti elő)
+     * összeállítja a teljes elérési útat, és hozzáadja a 'fileLoader' callback-et
+     * @returns {number} előkészített fájlok száma
+     */
+    prepareFilesForLoad() {
         let files;
         if (this._filesToLoad[this._loadLevel] !== undefined) {
             files = this._filesToLoad[this._loadLevel]
-        }
-        else
+        } else
             files = [];
-
-        this._actualLevelFileCount=files.length;
+        this._actualLevelFileCount = files.length;
         if (files.length !== 0) {
             this._preparedFilesForLoad = [];
-            for (let key of files) {
-                let [fileName, path, callback] = key;
+            for (let [fileNames, path, callback] of files) {
                 if (!Array.isArray(callback)) callback = [callback];
-                if (callback.find(value => value ==='fileLoaded') === undefined)
+                if (callback.find(value => value === 'fileLoaded') === undefined)
                     callback.push('fileLoaded')
-                for (let key2 of key[0]) {
+                for (let fileName of fileNames) {
                     if (this._preparedFilesForLoad === undefined) {
                         this._preparedFilesForLoad = []
                     }
-                    this._preparedFilesForLoad.push([path+fileName,callback]);
+                    this._preparedFilesForLoad.push([path + fileName, callback]);
                 }
             }
         }
-        console.log(this._preparedFilesForLoad)
         return this._preparedFilesForLoad.length;
     }
 
-    shiftPreparedFile()
-    {
+    /**
+     * visszaad egy betöltendő fájlt és eltávolítja a tömbből
+     * @returns {*} a betöltendő fájl neve + hozzávaló callback
+     */
+    shiftPreparedFile() {
         return this._preparedFilesForLoad.shift();
     }
-
-    // get preparedFilesForLoad() {
-    //     return this._preparedFilesForLoad;
-    // }
-    //
-    // set preparedFilesForLoad(value) {
-    //     this._preparedFilesForLoad = value;
-    // }
-    //
-    // addToPreparedFilesForLoad(path, fileName, callback)
-    // {
-    //     if (!Array.isArray(callback)) callback = [callback];
-    //     if (this._preparedFilesForLoad === undefined) {
-    //         this._preparedFilesForLoad = []
-    //     }
-    //     this._preparedFilesForLoad.push([path+fileName,callback]);
-    // }
-    //
-
-    //
-
-    //
-    // set filesToLoad(params) {
-    //     let [files, path, level, callback] = params;
-    //     if (this._filesToLoad === undefined) this._filesToLoad = [];
-    //     if (this._filesToLoad[level] === undefined)
-    //         this._filesToLoad[level] = [];
-    //     this._filesToLoad[level].push([files, path, callback])
-    // }
-
-    //
-
-    //
-    //
-    // getActualLevelPreparedFileCount()
-    // {
-    //
-    //     return this._preparedFilesForLoad.length;
-    // }
-    //
-    //
-    //
-
-    //
-    // getActualLevelFiles()
-    // {
-    //     return (this._filesToLoad[this._loadLevel] !== undefined?
-    //         this._filesToLoad[this._loadLevel]:[]);
-    // }
-    //
-    //
-    //
-
-
-
 
 }

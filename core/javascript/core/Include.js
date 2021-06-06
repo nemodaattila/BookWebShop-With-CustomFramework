@@ -1,25 +1,34 @@
+/**
+ * class Include
+ * futásidőben hozzáadott JS fájlokat tölti be (egyszerre többet is, akár több szinten)
+ */
 class Include {
+
+    /**
+     * a betöltendő fájlok nevét, és a betöltés pillanatnyi állását tartalmazza
+     */
     model;
 
-
-
-    constructor(){
-        if(!Include._instance){
+    constructor() {
+        if (!Include._instance) {
             Include._instance = this;
         }
         this.model = new IncludeModel();
-        console.log(this)
-        SubscriptionHandler.subscribe("fileLoaded", this,"fileLoaded")
-        SubscriptionHandler.subscribe("levelLoaded", this, "initLevelLoad")
+        EventSubscriptionHandler.subscribe("fileLoaded", this, "fileLoaded")
+        EventSubscriptionHandler.subscribe("levelLoaded", this, "initLevelLoad")
         return Include._instance;
     }
 
+    /**
+     * JS fájl hozzáadaása betöltésre
+     * @param files array|string filenév(ek) betöltendő fájlok neve
+     * @param path elérési út
+     * @param level töltési szint, melyik szinten töltse be
+     * @param callback sikeres betöltés esetén meghívandó fv
+     */
     addFilesToLoad(files, path, level, callback = []) {
-        console.log([files, path, level, callback])
         const {active, loadLevel} = this.model;
-        console.log([active, loadLevel])
         if ((active === false) || ((active === true) && (level > loadLevel))) {
-            console.log(files.length);
             if (files.length > 0)
                 this.model.filesToLoad = [files, path, level, callback];
         } else {
@@ -28,44 +37,60 @@ class Include {
         }
     };
 
+    /**
+     * fájltöltések elindítéása
+     */
     startLeveledLoad() {
-        console.log(this.model.filesToLoad)
+        console.log('LOADSTART')
+        // console.log(this.model)
         this.model.active = true;
         this.model.loadLevel = -1;
         this.initLevelLoad();
     }
 
+    /**
+     * fájl töltés X. SZintjének inicializálása
+     */
     initLevelLoad() {
-        let fileList;
-        console.log(this.model)
         this.model.loadLevel++;
         console.log('levelstart ' + this.model.loadLevel)
-
         if (this.model.loadLevel < this.model.getLevelCount()) {
             let fileCount = this.model.prepareFilesForLoad();
-            console.log(fileCount)
             if (fileCount !== 0) {
                 this.startLevelLoad()
-            }
-            else this.initLevelLoad();
+            } else this.initLevelLoad();
         } else {
-            this.model.active = false;
-            console.log('loadENd');
+            this.stopLoad()
         }
     }
 
+    /**
+     * fájltöltés leállítása
+     */
+    stopLoad() {
+        this.model.active = false;
+        this.model.loadLevel = -1;
+        console.log('loadENd')
+    }
+
+    /**
+     * fájl töltés x. szintjének végrehajtása
+     */
     startLevelLoad() {
-        console.log(this.model.actualLevelFileCount)
         this.model.progressFileCount = 0;
         for (let i = 0; i < this.model.actualLevelFileCount; i++) {
             let [actualFile, callback] = this.model.shiftPreparedFile();
-            console.log([actualFile, callback])
             this.loadScript(actualFile, callback)
         }
     }
 
-    loadScript(url, callback = null, callbackParam = null) {
-        console.log('loadsript ' + url);
+    /**
+     * egy JS fájl betöltése, callbcak hívása
+     * @param url a fájl url-je
+     * @param callback betöltés esetén hivandó függvények
+     * @DO más callback hiba esetén?
+     */
+    loadScript(url, callback = null) {
         let script = document.createElement("script");
         script.type = "text/javascript";
         script.src = url;
@@ -75,52 +100,46 @@ class Include {
                 if (script.readyState === "loaded" ||
                     script.readyState === "complete") {
                     script.onreadystatechange = null;
-                    console.log(url);
                     if (callback !== null)
-                        SubscriptionHandler.initSubscription(callback, url, 200)
-                        // this.callCallbackFunctions('SUCCESS', url, callback)
+                        EventSubscriptionHandler.triggerSubscriptionCall(callback, url, 200)
                 }
-                script.onerror = () =>
-                {
+                script.onerror = () => {
                     if (callback !== null)
-                        SubscriptionHandler.initSubscription(callback,url,400)
+                        EventSubscriptionHandler.triggerSubscriptionCall(callback, url, 400)
                 }
             };
         } else {  //Others
             script.onload = () => {
-                console.log('script hozzáadva: ' + url);
-                console.log(callback);
+                console.log('script loaded: ' + url);
                 // if (callbackParam !== null) url = [url, callbackParam]
                 if (callback !== null)
-                    SubscriptionHandler.initSubscription(callback, url, 200)
+                    EventSubscriptionHandler.triggerSubscriptionCall(callback, url, 200)
             }
-            script.onerror = () =>
-            {
+            script.onerror = () => {
+                console.log('script load failed: ' + url)
                 if (callback !== null)
-                    SubscriptionHandler.initSubscription(callback, url, 400)
+                    EventSubscriptionHandler.triggerSubscriptionCall(callback, url, 400)
             }
         }
     }
 
-    fileLoaded(result, resultState)
-    {
-        console.log([resultState, result])
-        if (resultState !== 200)
-        {
+    /**
+     * default callback fv JS fájl betöltése esetén
+     * ha resultstate nem 200 leáll a betöltés
+     * ha igen ellenőrzi hogy a szintről minden fájl betöltődött-e, ha igen meghívja a következő szint hívását
+     * @param result result adat
+     * @param resultState http result code
+     * @DO 400-ra leálljon -e a futás
+     */
+    fileLoaded(result, resultState) {
+
+        if (resultState !== 200) {
             this.model.loadLevel = Infinity;
-            console.log('ERROR - fileLoaded - ' + result)
-            SubscriptionHandler.initSubscription('levelLoaded','', 400)
+            EventSubscriptionHandler.triggerSubscriptionCall('levelLoaded', '', 400)
             return;
         }
-
-        if (++this.model.progressFileCount === this.model.actualLevelFileCount)
-        {
-            console.log([this.model.progressFileCount, this.model.actualLevelFileCount]  );
-            SubscriptionHandler.initSubscription('levelLoaded', this.model.loadLevel, 200 )
+        if (++this.model.progressFileCount === this.model.actualLevelFileCount) {
+            EventSubscriptionHandler.triggerSubscriptionCall('levelLoaded', this.model.loadLevel, 200)
         }
-
     }
-
-
-
 }

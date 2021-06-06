@@ -1,117 +1,165 @@
 <?php
 
-
 namespace core\backend\database\queryProcessor\complex;
 
-
 use core\backend\database\querySource\PDOQueryDataSource;
-use core\backend\database\querySource\WhereConditionsBackboneClass;
-use core\backend\helper\VariableHelper;
+use core\backend\model\RequestResultException;
+use JetBrains\PhpStorm\Pure;
 use PDO;
 
+/**
+ *
+ * Class PDOSelectProcessor PDO select utasítás létrehozására és feldolgozására szolgáló osztály
+ * @package core\backend\database\queryProcessor\complex
+ */
 class PDOSelectProcessor extends PDOQueryProcessorParent
 {
+    /**
+     * @var string a query eredmény fetchelési módja |
+     * fetch vagy fetchAll
+     */
     protected string $fetchType = 'fetchAll';
+    /**
+     * @var int eredmény fetchelési módja |
+     * pl: PDO::FETCH_ASSOC, PDO::FETCH_ARRAY
+     */
     protected int $fetchMode = PDO::FETCH_ASSOC;
 
-    public function query(PDOQueryDataSource $source, $fetchType='fetchAll', $fetchMode=PDO::FETCH_ASSOC)
+    /**
+     * a PDO lekérdezés paramétereinek mentése, majd feldolgozása
+     * @param PDOQueryDataSource $source - query adatforrás
+     * @param string $fetchType - fetch típus
+     * @param int $fetchMode - fetch mód
+     * @return array a lekérdezés eredménye
+     * @throws RequestResultException ha a fetchType nem fetch vagy fetchAll
+     * @example selectProc->query($source, 'fetch', PDO::FETCH_LAZY)
+     */
+    public function query(PDOQueryDataSource $source, string $fetchType = 'fetchAll', int $fetchMode = PDO::FETCH_ASSOC): array
     {
         $this->setSource($source);
         $this->fetchMode = $fetchMode;
         if (!in_array($fetchType, ['fetch', 'fetchAll']))
             throw new RequestResultException(400, ['errorCode' => 'PDOFTBT']);
         $this->fetchType = $fetchType;
-
         return $this->runQuery($this->createQuery());
     }
 
+    /**
+     * összeállítja és visszaadja egy lekérdezés query stringjét adatObjektumból
+     * @return string querystring
+     */
     public function createQuery(): string
     {
         $query = "SELECT " . $this->getTableAndAttributesQuery();
         $where = $this->source->getQueryWhere();
         if ($where !== '')
-            $query .= ' WHERE '.$where;
+            $query .= ' WHERE ' . $where;
 //        $query .= $this->getGroupGuery();
         $query .= $this->getOrderByQuery();
         $query .= $this->getLimitAndOffsetQuery();
-        return $query;
+        //        var_dump($query);
+        return trim(str_replace('  ', ' ', $query));
     }
 
-            private function createCountQuery(): string
-            {
-                $query = "SELECT COUNT(*) AS COUNT FROM ( SELECT " . $this->getTableAndAttributesQuery();
-                $where = $this->source->getQueryWhere();
-                if ($where !== '') {
-                    $query .= ' WHERE ' . $where;
-                }
-                $query.=') AS COUNTSUB';
-                $query = trim(str_replace('  ',' ',$query));
-                return $query;
-            }
-
-    public function countQuery(?PDOQueryDataSource $source= null)
+    /**
+     * @return string összeállítja és visszaadja egy darabszámlekérdező query stringjét adatObjektumból
+     */
+    private function createCountQuery(): string
     {
-        if ($source!==null)
+        $query = "SELECT COUNT(*) AS COUNT FROM ( SELECT " . $this->getTableAndAttributesQuery();
+        $where = $this->source->getQueryWhere();
+        if ($where !== '')
+            $query .= ' WHERE ' . $where;
+        $query .= ') AS COUNTSUB';
+        return trim(str_replace('  ', ' ', $query));
+    }
+
+    /**
+     * lefuttat egy összdarabszám lekérdező select query-t
+     * @param PDOQueryDataSource|null $source query adatForrás
+     * @return int a darabszám - a lekérdezés eredménye
+     * @throws RequestResultException ha a source null | !!! korábbi source újrafelhasználható, akkor nem kell megadni
+     */
+    public function countQuery(?PDOQueryDataSource $source = null): int
+    {
+        if ($source !== null)
             $this->setSource($source);
-        if ($this->source !== null)
-        {
+        if ($this->source !== null) {
             return $this->runCountQuery($this->createCountQuery());
         }
+        throw new RequestResultException(500, ['errorCode' => 'PDOSPCQSE']);
     }
 
-
-    private function getTableAndAttributesQuery()
+    /**
+     * visszaadja az adatosztály alapján a select querystring azon szakaszát, mely tartalmazza
+     * a résztvevő táblákat és attribumokat | pl: SELECT p.name FROM person as P
+     * @return string a query string szakasz
+     */
+    private function getTableAndAttributesQuery(): string
     {
         $query = '';
-        if ($this->source->isDistinct())
-        {
+        if ($this->source->isDistinct()) {
             $query = 'DISTINCT ';
         }
-        $tables=[];
-        $attribs=[];
-        $params=$this->source->getTablesAndAttributes();
-        foreach ($params as $table=>['alias'=>$alias, 'attributes'=>$attributes])
-        {
-            foreach ($attributes as ['name'=>$attributeName, 'alias'=>$attributeAlias])
-            {
-                $attribs[]=($alias!==null?$alias:$table).'.'.$attributeName.($attributeAlias!==null?' AS '.$attributeAlias:'');
+        $tables = [];
+        $attribs = [];
+        $params = $this->source->getTablesAndAttributes();
+        foreach ($params as $table => ['alias' => $alias, 'attributes' => $attributes]) {
+            foreach ($attributes as ['name' => $attributeName, 'alias' => $attributeAlias]) {
+                $attribs[] = ($alias !== null ? $alias : $table) . '.' . $attributeName . ($attributeAlias !== null ? ' AS ' . $attributeAlias : '');
             }
-            $tables[]=$table.($alias !== null?' AS '.$alias:'');
+            $tables[] = $table . ($alias !== null ? ' AS ' . $alias : '');
         }
-        $query.=implode(', ', $attribs).' '. $this->getSubQueryAsAttribute() .' FROM '.implode(', ', $tables).' ';
+        $query .= implode(', ', $attribs) . ' ' . $this->getSubQueryAsAttribute() . ' FROM ' . implode(', ', $tables) . ' ';
         return $query;
     }
 
-    private function getOrderByQuery()
+    /**
+     * visszaadja az adatosztály alapján a select querystring azon szakaszát, mely az
+     * ORDER BY paramétereit (attributum, irány) tartalmazza |
+     * pl: ORDER BY p.name ASC
+     * @return string az orderby queryszakasz
+     * @todo több paraméter alapján rendezés
+     */
+    #[Pure] private function getOrderByQuery(): string
     {
         $query = '';
         $order = $this->source->getOrder();
-        if ($order !== null)
-        {
-            $query .= 'ORDER BY '.$order.' ';
+        if ($order !== null) {
+            $query .= 'ORDER BY ' . $order . ' ';
         }
         $orderDir = $this->source->getOrderDirection();
-        if ($orderDir !== null)
-        {
-            $query .= $orderDir.' ';
+        if ($orderDir !== null) {
+            $query .= $orderDir . ' ';
         }
         return $query;
     }
 
-    private function getLimitAndOffsetQuery()
+    /**
+     * visszaadja az adatosztály alapján a select querystring azon szakaszát, mely az
+     * mely az OFFSET-et és a LIMIT-et tartalmazza |
+     * pl: 'LIMIT 10 5'
+     * @return string
+     */
+    #[Pure] private function getLimitAndOffsetQuery(): string
     {
         $limit = $this->source->hasLimit();
         $offset = $this->source->hasOffset();
         if (!$offset && $limit) {
-            return 'LIMIT ' . (($limit) ? '?' : '0').' ';
+            return 'LIMIT ?';
         } else
             if ($offset) {
-                return 'LIMIT ' . (($limit) ? '?' : '0') . ',' . (($offset) ? '?' : 0).' ';
+                return 'LIMIT ' . (($limit) ? '?' : '0') . ', ?';
             }
         return ' ';
     }
 
-    private function runQuery($queryString)
+    /**
+     * a megkapott querystring és a mentett adatForrás alapján lefuttatja a query-t
+     * @param string $queryString query szövege
+     * @return array a query eredménye
+     */
+    private function runQuery(string $queryString): array
     {
         $query = $this->pdo->prepare($queryString);
         $values = $this->source->getBindedValues();
@@ -126,7 +174,12 @@ class PDOSelectProcessor extends PDOQueryProcessorParent
         return $query->$rt($this->fetchMode);
     }
 
-    private function runCountQuery($queryString)
+    /**
+     * a megkapott querystring és a mentett adatForrás alapján lefuttatja a összdarabszám lekérdező query-t
+     * @param string $queryString query szövege
+     * @return int darabszám
+     */
+    private function runCountQuery(string $queryString): int
     {
         $query = $this->pdo->prepare($queryString);
         $values = $this->source->getBindedValues();
@@ -140,21 +193,21 @@ class PDOSelectProcessor extends PDOQueryProcessorParent
         return (int)$query->fetch()['COUNT'];
     }
 
-    private function getSubQueryAsAttribute()
+    /**
+     * ha van al-lekérdezés az adatOsztályban összeállítj a query stringjét és visszadja
+     * @return string al-query string
+     */
+    private function getSubQueryAsAttribute(): string
     {
         $query = '';
         $subQuery = $this->source->getSubQueryAsAttribute();
-        if (count($subQuery)!==0)
-        {
+        if (count($subQuery) !== 0) {
             $query = ',';
-            foreach ($subQuery as [$processor, $source, $alias])
-            {
+            foreach ($subQuery as [$processor, $source, $alias]) {
                 $processor->setSource($source);
-                $query .= "(".$processor->createQuery().') AS '.$alias.' ';
+                $query .= "(" . $processor->createQuery() . ') AS ' . $alias . ' ';
             }
         }
         return $query;
     }
-
-
 }

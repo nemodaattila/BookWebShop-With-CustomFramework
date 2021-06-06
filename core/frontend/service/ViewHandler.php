@@ -9,49 +9,12 @@ namespace core\frontend\service;
  */
 class ViewHandler
 {
-    /**
-     * @return bool|mixed
-     */
-    public function getSessionEnabled()
-    {
-        return $this->sessionEnabled;
-    }
 
     /**
-     * @param bool|mixed $sessionEnabled
-     */
-    public function setSessionEnabled($sessionEnabled): void
-    {
-        $this->sessionEnabled = $sessionEnabled;
-    }
-     /**
      * A Viewkezelohoz Singleton
-      * a ViewHandler egyke pédánya
+     * a ViewHandler egyke pédánya
      */
     private static ?ViewHandler $instance = NULL;
-
-    private bool $sessionEnabled = false;
-
-    private array $styleFiles = [];
-
-    /**
-     * @return array
-     */
-    public function getStyleFiles(): string
-    {
-        return implode('<br/>',$this->styleFiles);
-    }
-
-    /**
-     * @param array $styleFiles
-     */
-    public function setStyleFiles(array $styleFiles): void
-    {
-        foreach ($styleFiles as $value)
-        {
-            $this->styleFiles[]='<link rel="stylesheet" type="text/css" href='.ROOTURL.'/'.$value.'>';
-        }
-    }
 
     /**
      * Az adott layout neve, amit rendereleskor hasznalunk majd
@@ -65,19 +28,51 @@ class ViewHandler
      */
     private array $variables = array();
 
-     /**
+    /**
      * A jelenlegi view, ami megadja hogy melyik nezet lesz az aktualis
      * @var ?string $actualView
      */
-    private ?string $actualView=null;
+    private ?string $actualView = null;
 
-     /**
+    /**
      * Pufferert tartalom minden nezetreszhez
      * @var array $viewContents
      */
     private array $viewContents = array();
-//
-    public function __construct($sessionEnabled= false)
+
+    /**
+     * @var bool engedélyezett e a session
+     */
+    private bool $sessionEnabled;
+
+    /**
+     * @var array betöltendő stílusfájlok
+     */
+    private array $styleFiles = [];
+
+    public function getStyleFiles(): string
+    {
+        return implode('<br/>', $this->styleFiles);
+    }
+
+    public function setStyleFiles(array $styleFiles): void
+    {
+        foreach ($styleFiles as $value) {
+            $this->styleFiles[] = '<link rel="stylesheet" type="text/css" href=' . ROOTURL . '/' . $value . '>';
+        }
+    }
+
+    public function getSessionEnabled()
+    {
+        return $this->sessionEnabled;
+    }
+
+    public function setSessionEnabled($sessionEnabled): void
+    {
+        $this->sessionEnabled = $sessionEnabled;
+    }
+
+    public function __construct($sessionEnabled = false)
     {
         $this->sessionEnabled = $sessionEnabled;
         ob_start();
@@ -105,40 +100,30 @@ class ViewHandler
         $this->layout = $layout;
     }
 
-
     /**
+     * view beolvasása
      * két helyen kereshet:
      * project/frontend/view/<path>.php/html
      * vagy
      * project/frontend/pages/<$path>/view.php/html
-     * @param array $path
+     * @param string $pageName betöltendő oldal neve
+     * @param string $pathRoot view fájlok gyökérkönyvtára projekt/frontend-ben
      */
-    public function render(array $path,$pathRoot='view')
+    public function render(string $pageName, string $pathRoot = 'view')
     {
-//        var_dump($pathRoot);
-        $path = implode('\\', $path);
-//        var_dump($path);
-//        var_dump('project\frontend\\'.$pathRoot.'\\'.$path."\\view.html");
 
-        if (file_exists('project\frontend\\'.$pathRoot.'\\'.$path."\\view.php"))
-        {
-            require_once 'project\frontend\\'.$pathRoot.'\\'.$path."\\view.php";
-        }
-        else
-        if (file_exists('project\frontend\\'.$pathRoot.'\\'.$path.".php"))
-        {
-            require_once 'project\frontend\\'.$pathRoot.'\\'.$path.".php";
-        }
-        else
-        if (file_exists('project\frontend\\'.$pathRoot.'\\'.$path."\\view.html"))
-        {
-            require_once 'project\frontend\\'.$pathRoot.'\\'.$path."\\view.html";
-        }
-        else
-            if (file_exists('project\frontend\\'.$pathRoot.'\\'.$path.".html"))
-            {
-                require_once 'project\frontend\\'.$pathRoot.'\\'.$path.".html";
-            }
+        if (file_exists('project\frontend\\' . $pathRoot . '\\' . $pageName . "\\view.php")) {
+            require_once 'project\frontend\\' . $pathRoot . '\\' . $pageName . "\\view.php";
+        } else
+            if (file_exists('project\frontend\\' . $pathRoot . '\\' . $pageName . ".php")) {
+                require_once 'project\frontend\\' . $pathRoot . '\\' . $pageName . ".php";
+            } else
+                if (file_exists('project\frontend\\' . $pathRoot . '\\' . $pageName . "\\view.html")) {
+                    require_once 'project\frontend\\' . $pathRoot . '\\' . $pageName . "\\view.html";
+                } else
+                    if (file_exists('project\frontend\\' . $pathRoot . '\\' . $pageName . ".html")) {
+                        require_once 'project\frontend\\' . $pathRoot . '\\' . $pageName . ".html";
+                    }
         $this->renderLayout($pathRoot);
     }
 //
@@ -160,10 +145,10 @@ class ViewHandler
      * A beallitott ertekek lekerese
      * Ha a valtozo a munkamenetben van tarolva, akkor azt toroljuk
      * @param string $name A valtozo neve
-     * @param mixed $default A valtozo erteke amit visszaadunk ha a valtozo nem letezik
+     * @param mixed|null $default A valtozo erteke amit visszaadunk ha a valtozo nem letezik
      * @return mixed A valtozo erteke
      */
-    public function getVariable(string $name, $default = null)
+    public function getVariable(string $name, mixed $default = null): mixed
     {
         if (!isset($this->variables[$name])) {
             if (isset($_SESSION['viewhandler_variables']) && isset($_SESSION['viewhandler_variables'][$name])) {
@@ -176,25 +161,23 @@ class ViewHandler
         return $this->variables[$name];
     }
 
-     /**
+    /**
      * A megadott layout renderelese
+     * @param string $pathRoot view fájlok gyökérkönyvtára projekt/frontend-ben
      */
     private function renderLayout(string $pathRoot)
     {
         $this->newView("layout");
-        if (file_exists('project\frontend\\'.$pathRoot.'\layout\\'.$this->layout.".php"))
-        {
-            require_once 'project\frontend\\'.$pathRoot.'\layout\\'.$this->layout.".php";
-        }
-        else
-            if (file_exists('project\frontend\\'.$pathRoot.'\layout\\'.$this->layout."view.html"))
-            {
-                require_once 'project\frontend\\'.$pathRoot.'\layout\\'.$this->layout."view.html";
+        if (file_exists('project\frontend\\' . $pathRoot . '\layout\\' . $this->layout . ".php")) {
+            require_once 'project\frontend\\' . $pathRoot . '\layout\\' . $this->layout . ".php";
+        } else
+            if (file_exists('project\frontend\\' . $pathRoot . '\layout\\' . $this->layout . "view.html")) {
+                require_once 'project\frontend\\' . $pathRoot . '\layout\\' . $this->layout . "view.html";
             }
         ob_flush();
     }
 
-     /**
+    /**
      * A valtozas elott le kell tarolni az outputot. Abban az esetben fogjuk meghivni ha az adott nezet vagy nezetresz megvaltozik
      * @param string $name Nezetresz neve
      */
@@ -214,16 +197,15 @@ class ViewHandler
         ob_clean();
     }
 
-      /**
+    /**
      * A sessionbe mentettüzenet lekérése
-     * @return array Az uzenet és a typus
+     * @return array|null Az uzenet és a typus
      */
     public function getMessageSession(): ?array
     {
         if ($this->sessionEnabled === true) {
             $message = ($this->getVariable('_messageencoded') === true) ? json_decode($this->getVariable('_message')) : $this->getVariable('_message');
-            if ($message !== null)
-            {
+            if ($message !== null) {
                 $type = $this->getVariable('_messagetype');
                 unset($_SESSION['_messagetype']);
                 unset($_SESSION['_messageencoded']);
@@ -291,5 +273,3 @@ class ViewHandler
 //            $this->redirect();
 //    }
 }
-
-

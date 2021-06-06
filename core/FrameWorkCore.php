@@ -1,10 +1,15 @@
 <?php
+
 namespace core;
 
+/**
+ * Class FrameWorkCore framework inicializás, router inicializása, futtatása
+ * @package core
+ */
 class FrameWorkCore
 {
-    public static ?FrameWorkCore $instance=null;
-    private backend\service\RoutingInitiator $router;
+    public static ?FrameWorkCore $instance = null;
+
     public static function getInstance(): FrameWorkCore
     {
         if (self::$instance === NULL) {
@@ -15,9 +20,7 @@ class FrameWorkCore
 
     public function run()
     {
-
-        $this->router=backend\service\RoutingInitiator::getInstance();
-        $this->router->run();
+        backend\service\RoutingInitiator::getInstance()->run();
     }
 
 }

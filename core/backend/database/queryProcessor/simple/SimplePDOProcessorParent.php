@@ -1,24 +1,28 @@
 <?php
 
+namespace core\backend\database\queryProcessor\simple;
 
-namespace core\backend\database\QueryProcessor\simple;
-
-
+use core\backend\model\RequestResultException;
 use PDO;
 
-class SimplePDOProcessorParent
+/**
+ * Class SimplePDOProcessorParent egyszerűsített PDO segédosztályok ősosztálya
+ * @package core\backend\database\QueryProcessor\simple
+ */
+abstract class SimplePDOProcessorParent
 {
+    /**
+     * @var PDO PDO csatlakozás
+     */
     protected PDO $pdo;
-
     /**
      * @var string a sql lekérdezés stringje
      */
     protected string $command;
-
     /**
-     * @var array a lekéérdezés paraméterei
+     * @var array a lekérdezés paraméterei - bind-olandó értékek
      */
-    protected array $queryValues=[];
+    protected array $queryValues = [];
 
     /**
      * a lekérdezés megadása egyszerű string formában
@@ -30,7 +34,7 @@ class SimplePDOProcessorParent
     }
 
     /**
-     * visszadja a beállíitott query stringet
+     * visszadja a beállított query stringet
      * @return string  a query string
      */
     public function getCommand(): string
@@ -39,9 +43,9 @@ class SimplePDOProcessorParent
     }
 
     /**
-     * @param mixed $values a lekérdezés paramétereinek
+     * @param mixed $values a lekérdezés paramétereinek megadása
      */
-    public function setvalues($values)
+    public function setvalues(mixed $values)
     {
         if (!is_array($values)) $values = [$values];
         $this->queryValues = $values;
@@ -61,14 +65,17 @@ class SimplePDOProcessorParent
         $this->pdo = $pdo;
     }
 
-    public function execute()
+    /**
+     * @return mixed a lekérdezés végrehajtása
+     * @throws RequestResultException ha nem sikerült a lekérdezés, kivétel tartalma: (httpkód 500, [hibakód, querystring])
+     */
+    public function execute(): mixed
     {
         $query = $this->pdo->prepare($this->getCommand());
         $success = $query->execute($this->getValues());
-        if ($success === false)
-        {
-            throw new RequestResultException(500, ['errorcode'=>'PDOSSSF', 'errorMessage'=>$this->getCommand()]);
+        if ($success === false) {
+            throw new RequestResultException(500, ['errorCode' => 'PDOSSSF', 'errorMessage' => $this->getCommand()]);
         }
-        return $success;
+        return true;
     }
 }

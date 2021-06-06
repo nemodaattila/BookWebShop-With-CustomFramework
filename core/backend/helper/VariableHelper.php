@@ -1,11 +1,14 @@
 <?php
 
-
 namespace core\backend\helper;
 
 use core\backend\interfaces\IConvertableToArrayInterface;
 use stdClass;
 
+/**
+ * Class VariableHelper változókkal kapcsolatos segédfüggvények
+ * @package core\backend\helper
+ */
 class VariableHelper
 {
     /**
@@ -18,18 +21,32 @@ class VariableHelper
         return json_decode(json_encode($class), true);
     }
 
-    public static function convertClassToArray(?IConvertableToArrayInterface $class)
+    /**
+     * megfelelő tipusú objekt tömbbé alakít
+     * @param IConvertableToArrayInterface|null $class az átalakítandó tömb
+     * @return array a tömbösített objekt
+     */
+    public static function convertObjectToArray(?IConvertableToArrayInterface $class): array
     {
-        if ($class === null) return '';
+        if ($class === null) return [];
         return $class->getAlldata();
     }
 
-    public static function sumDump($input)
+    /**
+     *
+     * @param mixed $input komplex változó kiiratása
+     */
+    public static function sumDump(mixed $input)
     {
-        echo '<pre>';print_r($input);echo '</pre>';
+        echo '<pre>';
+        print_r($input);
+        echo '</pre>';
     }
 
-    public static function sumDumpWithLine($input)
+    /**
+     * @param mixed $input komplex változók kiiratása + tartalmazó fájl neve és sora
+     */
+    public static function sumDumpWithLine(mixed $input)
     {
         $trace = debug_backtrace();
         $caller = $trace[0];

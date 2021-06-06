@@ -1,14 +1,18 @@
 <?php
+
 namespace core\backend\service;
+
 use core\backend\helper\VariableHelper;
 use core\backend\model\RequestParameters;
 use core\backend\model\RequestResultException;
 use core\backend\interfaces\IRestInterface;
 use Error;
 use Exception;
+use JetBrains\PhpStorm\NoReturn;
+use JetBrains\PhpStorm\Pure;
 
 /**
- * Class Routing a request alapján az útvonal betültését és meghívását intézi
+ * Class Routing a request alapján az útvonal ellenőrzését, betöltését és meghívását valósítja meg
  * SINGLETON class
  * @package backend
  */
@@ -45,15 +49,15 @@ final class Routing
     private ?string $allowedHeaders;
 
     /**
-     * @var array requestből származó paraméterek
+     * @var RequestParameters requestből származó paraméterek
      */
-    private \core\backend\model\RequestParameters $reqestParameters;
+    private RequestParameters $reqestParameters;
 
     /**
      * visszadja a Routing egyke példányát, ha nem létezik létrehozza
      * @return Routing|null a példány
      */
-    public static function getInstance() :?Routing
+    public static function getInstance(): ?Routing
     {
         if (self::$instance == null) {
             self::$instance = new Routing();
@@ -61,10 +65,10 @@ final class Routing
         return self::$instance;
     }
 
-    private function __construct()
+    #[Pure] private function __construct()
     {
         $this->cors = false;
-        $this->reqestParameters=new RequestParameters();
+        $this->reqestParameters = new RequestParameters();
     }
 
     /**
@@ -72,12 +76,11 @@ final class Routing
      * lekéri belőle a lehetséges Routokat tömbösen és átadja felvételre
      * @param RestParent $rest a RequestFeldolgozó -> a request első paramétere
      */
-    public function addRoutes(\core\backend\interfaces\IRestInterface $rest)
+    public function addRoutes(IRestInterface $rest)
     {
         $this->rest = $rest;
         $routes = $this->rest->getRoutes();
-        foreach ($routes as $value)
-        {
+        foreach ($routes as $value) {
             $this->addRoute(...$value);
         }
 
@@ -87,11 +90,11 @@ final class Routing
      * hozzáadja a routerhez a megadott útvonalat
      * @param string $httpMethod request tipusa - get/post/put/delete
      * @param string $url - a request url-je pl: user/$1
-     * @param string $task  - a meghívandó függvény
+     * @param string $task - a meghívandó függvény
      * @param bool $authRequired - kell e authentikáció - default false
      * @param bool $isJson - a requestben van-e json fejléc/adat
      */
-    private function addRoute(string $httpMethod, string $url, string $task, bool $authRequired=false,
+    private function addRoute(string $httpMethod, string $url, string $task, bool $authRequired = false,
                               bool $isJson = true, bool $responsIsJson = true)
     {
         array_push($this->routes, array(
@@ -100,7 +103,7 @@ final class Routing
             "task" => $task,
             "auth_required" => $authRequired,
             'is_json' => $isJson,
-            'response_is_json'=>$responsIsJson
+            'response_is_json' => $responsIsJson
         ));
     }
 
@@ -117,24 +120,19 @@ final class Routing
     }
 
     /**
-     * megállapítja hogy a megadott adatokkal létezik e route a Routerben
+     * megállapítja hogy a megadott adatokkal létezik-e route a Routerben
      * url paramétereket átadja
      * @param $httpMethod - a http method
      * @param $url - a kért url
      * @return bool az url route létezik-e
      * @example GET /user/admin/ => /user/$1/
      */
-    private function identifyHeader($httpMethod, $url,$path): bool
+    private function identifyHeader($httpMethod, $url, $path): bool
     {
-//        $path = substr($_SERVER['REQUEST_URI'], strlen($_SERVER['PHP_SELF']) - strlen(basename($_SERVER['PHP_SELF'])));
-//        $path = parse_url($path)['path'];
         if ($_SERVER['REQUEST_METHOD'] !== strtoupper($httpMethod) && ($this->cors === false || $_SERVER['REQUEST_METHOD'] !== 'OPTIONS')) {
             return false;
         }
-//        $path = explode('/', $path);
         $url = explode('/', $url);
-//        var_dump($path);
-//        var_dump($url);
         if (count($path) !== count($url)) {
             return false;
         }
@@ -145,59 +143,49 @@ final class Routing
                     $this->reqestParameters->reset();
                     return false;
                 }
-                $this->reqestParameters->addUrlParameter(filter_var($path[$i],FILTER_SANITIZE_STRING));
+                $this->reqestParameters->addUrlParameter(filter_var($path[$i], FILTER_SANITIZE_STRING));
             }
         }
         return true;
     }
 
     /**
-     * a request alapján megkeresi a megfelelő route-ot, össszeszedi a request paramétereket, és elküldi feldolgozásra a kérésrt
-     * @return bool ha hiba van vagy nem jó a route visszaad egy bool egyébként response-t küld a kliensnek
-     * @throws RequestResultException sql hiba lehetséges
+     * a request alapján megkeresi a megfelelő route-ot, össszeszedi a request paramétereket, és elküldi feldolgozásra a kérést
+     * @return bool ha hiba van vagy nem jó a route visszaad egy bool-t, egyébként meghívja a route-ban található függvényt
      */
-    public function processRoutingRequest(array $urlTarget): bool {
+    public function processRoutingRequest(array $urlTarget): bool
+    {
         $supportedHeaders = array();
-        foreach ($this->routes as $route)
-        {
-            if ($this->identifyHeader($route['http_method'], $route['url'],$urlTarget)) {
+        foreach ($this->routes as $route) {
+            if ($this->identifyHeader($route['http_method'], $route['url'], $urlTarget)) {
 
                 if ($this->cors == true && $_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
                     array_push($supportedHeaders, strtoupper($route['http_method']));
                 } else {
-                    if ($route['is_json'] && isset($_SERVER['CONTENT_TYPE']) && strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false) {
-                        if ($_SERVER['REQUEST_METHOD'] == 'PUT')
-                        {
-                            $putvars=[];
-                            parse_str(file_get_contents("php://input"),$putvars);
+                    if ($route['is_json'] && isset($_SERVER['CONTENT_TYPE']) && str_contains($_SERVER['CONTENT_TYPE'], 'application/json')) {
+                        if ($_SERVER['REQUEST_METHOD'] == 'PUT') {
+                            $putvars = [];
+                            parse_str(file_get_contents("php://input"), $putvars);
                             $this->reqestParameters->setRequestData($putvars);
-                        }
-                        else
+                        } else
                             $this->reqestParameters->setRequestData(VariableHelper::convertStdClassToArray(json_decode(file_get_contents('php://input'))));
                     }
                     if ($this->cors === true) {
                         header('Acces-Control-Allow-Origin:', $this->allowedOrigin);
                     }
-                    if ($route['auth_required'] === true)
-                    {
+                    if ($route['auth_required'] === true) {
                         $this->rest->authenticateUser();
                     }
                     $task = $route['task'];
                     try {
                         $this->rest->$task($this->reqestParameters);
-                    }
-                    catch (RequestResultException $e)
-                    {
+                    } catch (RequestResultException $e) {
                         [$code, $data] = $e->getResult();
                         $this->sendResponse($code, $data, $route['response_is_json']);
-                    }
-                    catch (Exception $e)
-                    {
+                    } catch (Exception $e) {
                         $this->sendResponse(500, $e->getMessage(), $route['response_is_json']);
 
-                    }
-                    catch (Error $e)
-                    {
+                    } catch (Error $e) {
                         $this->sendResponse(500, $e->getMessage(), $route['response_is_json']);
                     }
                     return true;
@@ -208,24 +196,27 @@ final class Routing
             header('Acces-Control-Allow-Origin:', $this->allowedOrigin);
             header('Acces-Control-Allow-Headers:', $this->allowedHeaders);
             header('Acces-Control-Allow-Methods:', implode(',', $supportedHeaders) . ',OPTIONS');
-            header($_SERVER['SERVER_PROTOCOL'].' 500');
-            echo ('NO MATCHING ROOT FOUND');
+            header($_SERVER['SERVER_PROTOCOL'] . ' 500');
+            echo('NO MATCHING ROOT FOUND');
             return true;
         }
         return false;
     }
 
-    private function sendResponse(int $httpCode, $data, bool $responseIsJSon)
+    /**
+     * html response-t állít össze és küld el
+     * @param int $httpCode http response kód
+     * @param mixed $data a response adat
+     * @param bool $responseIsJSon ha true az adatot json-né alakítja
+     */
+    #[NoReturn] private function sendResponse(int $httpCode, mixed $data, bool $responseIsJSon)
     {
-        header($_SERVER['SERVER_PROTOCOL'].' '.$httpCode);
-        if ($responseIsJSon === true)
-        {
+        header($_SERVER['SERVER_PROTOCOL'] . ' ' . $httpCode);
+        if ($responseIsJSon === true) {
             header('Content-Type: application/json');
-
             echo json_encode($data);
 //            echo json_encode([$data,debug_backtrace()]);
-        }
-        else
+        } else
             echo $data;
         die();
     }

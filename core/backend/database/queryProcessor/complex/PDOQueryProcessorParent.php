@@ -1,19 +1,26 @@
 <?php
 
-
 namespace core\backend\database\queryProcessor\complex;
-
-
 use core\backend\database\querySource\PDOQueryDataSource;
 use core\backend\interfaces\IPDOQueryProcessorInterface;
 use PDO;
 
-class   PDOQueryProcessorParent implements IPDOQueryProcessorInterface
+/**
+ * Class PDOQueryProcessorParent komplex PDO kezelő osztályok őse
+ * @package core\backend\database\queryProcessor\complex
+ * @todo named placeholder megvalósítása
+ */
+abstract class PDOQueryProcessorParent implements IPDOQueryProcessorInterface
 {
+    /**
+     * @var PDOQueryDataSource adatforrás a PDO-hoz
+     */
     protected PDOQueryDataSource $source;
 
+    /**
+     * @var PDO pdo csatlakozás
+     */
     protected PDO $pdo;
-
 
     public function __construct(PDO $pdo)
     {
@@ -22,10 +29,5 @@ class   PDOQueryProcessorParent implements IPDOQueryProcessorInterface
     public function setSource(PDOQueryDataSource $source): void
     {
         $this->source = $source;
-    }
-
-    public function getQueryString(): string
-    {
-        // TODO: Implement getQueryString() method.
     }
 }
