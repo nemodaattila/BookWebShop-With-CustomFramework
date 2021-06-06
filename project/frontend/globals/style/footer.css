@@ -1,11 +1,11 @@
 /*footer*/
 
-footer{
-    margin:10px;
+footer {
+    margin: 10px;
     text-align: center;
     clear: both;
 }
 
-footer>aside>a{
+footer > aside > a {
     margin: 5px 10px;
 }

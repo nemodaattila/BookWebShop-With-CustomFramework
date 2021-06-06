@@ -1,5 +1,6 @@
 <?php
 namespace project\frontend\pages\layout;
+
 use core\frontend\service\ViewHandler;
 
 $view = ViewHandler::getInstance()

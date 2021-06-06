@@ -16,7 +16,7 @@ $view = ViewHandler::getInstance()
     echo $view->getStyleFiles();
     ?>
     <link rel="stylesheet" type="text/css" href='<?php echo ROOTURL;?>/project/frontend/globals/style/header.css' />
-    <link rel="stylesheet" type="text/css" href=''<?php echo ROOTURL;?>/project/frontend/globals/style/footer.css' />
+    <link rel="stylesheet" type="text/css" href='<?php echo ROOTURL;?>/project/frontend/globals/style/footer.css' />
 </head>
 <body>
 <header>

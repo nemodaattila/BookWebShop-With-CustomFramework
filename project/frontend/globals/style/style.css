@@ -1,44 +1,37 @@
 /*commonstyle*/
 
 body {
-    background-color:#F5F5DC;
-
+    background-color: #F5F5DC;
 }
 
-main{
+main {
     margin: 10px;
 }
-.csstable
-{
-    display:table;
+
+.csstable {
+    display: table;
 
 }
 
-.cssTable .cssRow
-{
-    display:table-row;
+.cssTable .cssRow {
+    display: table-row;
     box-sizing: content-box;
 }
 
-.cssTable .cssRow>*
-{
-    display:table-cell;
+.cssTable .cssRow > * {
+    display: table-cell;
 }
 
-/*Mainbookdiv*/
-#mainBookDiv
-{
-    display:grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr) ) ;
+#mainBookDiv {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr) );
 }
 
-.bookDiv
-{
-    display:grid;
+.bookDiv {
+    display: grid;
     grid-template-columns: 150px 200px;
     margin: 10px;
 }
-
 
 figure {
     display: block;
@@ -48,49 +41,37 @@ figure {
     margin-inline-end: 0px;
 }
 
-/*figure>a>img{*/
-/*    height: 212px;*/
-/*    width: 150px;*/
-/*}*/
-
-.bookDesc>section
-{
+.bookDesc > section {
     margin: 10px;
-    margin-bottom:auto ;
+    margin-bottom: auto;
 }
 
-.bookDesc section:nth-of-type(3)
-{
-    margin-bottom:0% ;
+.bookDesc section:nth-of-type(3) {
+    margin-bottom: 0%;
 }
 
-.tableMain{
-    display:grid;
-    grid-template-columns: 20% 80% ;
+.tableMain {
+    display: grid;
+    grid-template-columns: 20% 80%;
 }
 
-
-
-a{
-    text-decoration:none;
+a {
+    text-decoration: none;
     color: darkslateblue;
     padding: 3px;
 }
 
-a:hover
-{
+.searchLabel:hover, a:hover {
     color: green;
-    background-color:#b697bd;
+    background-color: #b697bd;
     border-radius: 6px;
 }
 
-.searchLink:visited, .searchLink:link
-{
+.searchLink:visited, .searchLink:link {
     color: darkslateblue;
 }
 
 [aria-current=page] {
     background-color: #DCDCF5;
     color: #000;
-/*border-bottom: .25em solid #444;*/
 }
